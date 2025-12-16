@@ -1,0 +1,138 @@
+/* === Variables globales === */
+:root {
+  --brand-blue: #071121; /* color principal */
+  --brand-blue-dark: #05202b; /* para hover/estado activo */
+  --brand-accent: #7fb8d8; /* acento claro para hover/links */
+
+  /* Guardamos el verde original para usarlo en estados hover según lo solicitado */
+  --focus-green-orig: #16A34A;
+  --focus-green-dark-orig: #15803D;
+
+  /* Mapear los nombres comunes a los valores actuales (principalmente azul) */
+  --focus-green: var(--brand-blue);
+  --focus-green-dark: var(--brand-blue-dark);
+}
+
+/* === Colores principales (sobrescriben Bootstrap) === */
+.btn-primary {
+  /* Por defecto: botón verde (original) */
+  background-color: var(--focus-green-orig) !important;
+  border-color: var(--focus-green-orig) !important;
+  color: #fff;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+}
+
+/* Header/bg primary debe usar el azul profundo */
+.bg-primary, .navbar, .navbar-dark .navbar-nav .nav-link.active {
+  background-color: var(--brand-blue) !important;
+  border-color: var(--brand-blue) !important;
+}
+
+/* Asegurar que los links del navbar se lean sobre el azul */
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255,255,255,0.9);
+}
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+  color: var(--focus-green-orig); /* verde original al posar */
+}
+
+.btn-primary:hover {
+  /* Al posar: cambia a azul (inversión) */
+  background-color: var(--brand-blue) !important;
+  border-color: var(--brand-blue) !important;
+  box-shadow: 0 6px 18px rgba(7,17,33,0.12);
+  transform: translateY(-1px);
+}
+
+.text-primary {
+  color: var(--focus-green) !important; /* mapeado al azul */
+}
+
+/* Marca en verde */
+.brand-name {
+  color: var(--focus-green-orig);
+}
+
+/* === Fuente y espaciado general === */
+/* layout base para empujar footer al final */
+html, body {
+  height: 100%;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  padding-top: 64px; /* espacio para navbar fixed-top */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* === Navbar === */
+.navbar {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+/* === Logo del navbar === */
+.logo-navbar {
+height: 50px;           
+width: auto;
+object-fit: contain;    
+margin-right: 10px;
+  transition: transform 0.3s ease; /* animación suave al pasar el mouse */
+}
+
+.logo-navbar:hover {
+  transform: scale(1.08);
+}
+
+/* === Responsive: ajusta tamaño del logo en pantallas pequeñas === */
+@media (max-width: 768px) {
+  .logo-navbar {
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-navbar {
+    height: 36px;
+  }
+}
+
+/* === Footer === */
+footer {
+  border-top: 1px solid rgba(7,17,33,0.08);
+  background-color: rgba(7,17,33,0.03); /* sutil fondo azul claro */
+  color: rgba(7,17,33,0.8);
+  margin-top: auto; /* empuja el footer al final cuando no hay suficiente contenido */
+}
+
+/* Main flexible que empuja el footer hacia abajo */
+main {
+  flex: 1 0 auto;
+}
+
+/* === Botón principal === */
+.btn-primary {
+  font-weight: 600;
+  border-radius: 30px;
+}
+
+/* Hover más visible para botones */
+.btn-primary:hover, .btn-primary:focus {
+  filter: brightness(0.96);
+}
+
+/* Estilos visuales para inputs validados */
+.form-control.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 .15rem rgba(40,167,69,0.12);
+}
+.form-control.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 .15rem rgba(220,53,69,0.08);
+}
+
+.valid-feedback i, .invalid-feedback i {
+  margin-right: 6px;
+}
