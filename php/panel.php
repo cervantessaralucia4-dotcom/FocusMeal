@@ -15,42 +15,23 @@ $usuario = $_SESSION["usuario"];
 <head>
     <meta charset="UTF-8">
     <title>Panel - FocusMeal</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f2f2f2;
-            padding: 40px;
-        }
-        .panel {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            width: 400px;
-            margin: auto;
-            text-align: center;
-            box-shadow: 0 0 10px #ddd;
-        }
-        a {
-            display: block;
-            margin: 10px;
-            padding: 10px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/index.css">
 </head>
 <body>
 
-<div class="panel">
-    <h2>Bienvenido, <?= $usuario["nombre"] ?> 👋</h2>
+<h1>Bienvenida, <?php echo htmlspecialchars($usuario["nombre"]);?> 👋</h1>
 
-    <a href="#">Ver plan de comidas</a>
-    <a href="#">Editar perfil</a>
-    <a href="#">Registrar progreso</a>
-    <a href="logout.php">Cerrar sesión</a>
-</div>
+<p>Correo: <?php echo htmlspecialchars($usuario["correo"]); ?></p>
+
+<hr>
+
+<h3>¿Que deseas hacer?</h3>
+<ul>
+    <li><a href="planes.php">🍽 Ver planes de alimentación</a></li>
+    <li><a href="progreso.php"></a>📊 Ver progreso</li>
+    <li><a href="perfil.php"></a>⚙️ Editar perfil</li>
+    <li><a href="logout.php">🚪 Cerrar sesión</a></li>
+</ul>
 
 </body>
 </html>
