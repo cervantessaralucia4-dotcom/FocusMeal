@@ -28,7 +28,7 @@ $usuario = $_SESSION["usuario"];
 <h3>¿Que deseas hacer?</h3>
 <ul>
     <li><a href="planes.php">🍽 Ver planes de alimentación</a></li>
-    <li><a href="progreso.php"></a>📊 Ver progreso</li>
+    <li><a href="progreso.php">📊 Ver progreso</a></li>
     <li><a href="perfil.php"></a>⚙️ Editar perfil</li>
     <li><a href="logout.php">🚪 Cerrar sesión</a></li>
 </ul>
