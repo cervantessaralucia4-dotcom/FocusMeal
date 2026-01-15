@@ -7,44 +7,110 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
-<!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="img/logo.png" alt="Focus Meal logo" class="logo-navbar">
-        <span class="ms-2 fw-bold">Focus Meal</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" 
-              aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="plan.html">Planes</a></li>
-          <li class="nav-item"><a class="nav-link" href="login.html">Ingresar</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 
-<!-- CONTENIDO PRINCIPAL -->
-<main class="container text-center py-5">
-<h1 class="mt-5 pt-4">Bienvenido a <span class="brand-name">Focus Meal</span></h1>
-<p class="lead text-muted">Planifica tu alimentación, mejora tus hábitos y logra tus metas con equilibrio.</p>
-<a href="registro.html" class="btn btn-primary btn-lg mt-3">Comenzar</a>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="img/logo.png" alt="Focus Meal logo" class="logo-navbar">
+      <span class="ms-2 fw-bold logo-text">Focus Meal</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="plan.html">Planes</a></li>
+        <li class="nav-item"><a class="nav-link" href="login.html">Ingresar</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<main class="text-center" style="padding: 2rem 2rem;">
+  <div class="hero-container">
+    <img src="img/mockup.png" alt="Mockup de Focus Meal" class="hero-image fade-in">
+    <h1 class="hero-title fade-in-delay">
+      Bienvenido a <span class="brand-name">Focus Meal</span>
+    </h1>
+  </div>
+  <a href="registro.html" class="btn btn-primary btn-lg hero-cta fade-in-delay-more">Comenzar</a>
 </main>
+
+<!-- DESCUBRE -->
+<section class="features" style="background-color: #f3f3f3; padding-top: 0;">
+  <h2 class="text-center titulo-descubre mb-0">Descubre</h2>
+  <div class="container tarjetas-scroll">
+    <img src="img/tarjeta1.png" alt="Tarjeta 1">
+    <img src="img/tarjeta2.png" alt="Tarjeta 2">
+    <img src="img/tarjeta 3.png" alt="Tarjeta 3">
+    <img src="img/tarjeta4.png" alt="Tarjeta 4">
+    <img src="img/tarjeta5.png" alt="Tarjeta 5">
+    <img src="img/tarjeta6.png" alt="Tarjeta 6">
+    <!-- Duplicar para loop infinito -->
+    <img src="img/tarjeta1.png" alt="Tarjeta 1">
+    <img src="img/tarjeta2.png" alt="Tarjeta 2">
+    <img src="img/tarjeta 3.png" alt="Tarjeta 3">
+    <img src="img/tarjeta4.png" alt="Tarjeta 4">
+    <img src="img/tarjeta5.png" alt="Tarjeta 5">
+    <img src="img/tarjeta6.png" alt="Tarjeta 6">
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer class="py-4 bg-light text-center mt-5">
-<small class="text-muted">© 2025 Focus Meal — Tu bienestar empieza aquí</small>
+  <small class="text-muted">© 2025 Focus Meal — Tu bienestar empieza aquí</small>
 </footer>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Hide navbar on scroll -->
+<script>
+  (function(){
+    let lastScroll = 0;
+    const nav = document.querySelector('.navbar');
+    if (!nav) return;
+    window.addEventListener('scroll', () => {
+      const current = window.pageYOffset || document.documentElement.scrollTop;
+      if (current > lastScroll && current > 80) {
+        nav.classList.add('hidden');
+      } else {
+        nav.classList.remove('hidden');
+      }
+      lastScroll = current <= 0 ? 0 : current;
+    }, { passive: true });
+  })();
+
+  // Animación automática del carrusel
+  (function(){
+    const scrollContainer = document.querySelector('.tarjetas-scroll');
+    if (!scrollContainer) return;
+    let scrollAmount = 0;
+    const scrollSpeed = 1; // píxeles por frame
+    const interval = 50; // ms
+
+    setInterval(() => {
+      scrollAmount += scrollSpeed;
+      scrollContainer.scrollLeft = scrollAmount;
+
+      // Reset cuando llegue al final (mitad para loop)
+      if (scrollAmount >= scrollContainer.scrollWidth / 2) {
+        scrollAmount = 0;
+      }
+    }, interval);
+  })();
+</script>
+
 </body>
 </html>
