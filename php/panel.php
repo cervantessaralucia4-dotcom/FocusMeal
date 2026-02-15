@@ -1,10 +1,9 @@
 <?php
 session_start();
 
-// Si no hay sesión activa, no puede entrar al panel
 if (!isset($_SESSION["usuario"])) {
     header("Location: ../login.html");
-    exit;
+    exit();
 }
 
 $usuario = $_SESSION["usuario"];
@@ -15,23 +14,66 @@ $usuario = $_SESSION["usuario"];
 <head>
     <meta charset="UTF-8">
     <title>Panel - FocusMeal</title>
-    <link rel="stylesheet" href="../css/index.css">
+
+    <!-- Fuente profesional -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS del panel -->
+    <link rel="stylesheet" href="../css/panel.css">
 </head>
 <body>
 
-<h1>Bienvenida, <?php echo htmlspecialchars($usuario["nombre"]);?> 👋</h1>
+    <!-- HEADER -->
+    <div class="panel-header">
+        <h1>Focus Meal 🍽️</h1>
+        <a href="logout.php" class="btn-primary">Cerrar sesión</a>
+    </div>
 
-<p>Correo: <?php echo htmlspecialchars($usuario["correo"]); ?></p>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="panel-container">
 
-<hr>
+        <!-- BIENVENIDA -->
+        <div class="card">
+            <h2>Bienvenida, <?php echo htmlspecialchars($usuario["nombre"]); ?> 👋</h2>
+            <p><strong>Correo:</strong> <?php echo htmlspecialchars($usuario["correo"]); ?></p>
+        </div>
 
-<h3>¿Que deseas hacer?</h3>
-<ul>
-    <li><a href="planes.php">🍽 Ver planes de alimentación</a></li>
-    <li><a href="progreso.php">📊 Ver progreso</a></li>
-    <li><a href="perfil.php"></a>⚙️ Editar perfil</li>
-    <li><a href="logout.php">🚪 Cerrar sesión</a></li>
-</ul>
+       <!-- ESTADÍSTICAS -->
+        <?php
+// Aquí luego conectaremos la base de datos
+$caloriasHoy = 0; // temporal hasta conectar BD
+$metaDiaria = 2200;
 
-</body>
-</html>
+if ($caloriasHoy > 0) {
+    $restantes = $metaDiaria - $caloriasHoy;
+?>
+
+<div class="stats">
+    <div class="stat-box">
+        <h2><?php echo $caloriasHoy; ?> kcal</h2>
+        <p>Calorías consumidas hoy</p>
+    </div>
+
+    <div class="stat-box">
+        <h2><?php echo $metaDiaria; ?> kcal</h2>
+        <p>Meta diaria</p>
+    </div>
+
+    <div class="stat-box">
+        <h2><?php echo $restantes; ?> kcal</h2>
+        <p>Calorías restantes</p>
+    </div>
+</div>
+
+<?php
+} else {
+?>
+
+<div class="card" style="text-align:center;">
+    <h3>Aún no has registrado comidas hoy 🍽️</h3>
+    <p>Comienza agregando tu primera comida para ver tu progreso.</p>
+    <br>
+    <a href="planes.php" class="btn-primary">Agregar comida</a>
+</div>
+
+<?php } ?>

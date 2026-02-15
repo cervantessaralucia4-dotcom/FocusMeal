@@ -2,7 +2,6 @@
 session_start();
 include("conexion.php");
 
-// Verificar sesión
 if (!isset($_SESSION["usuario"])) {
     header("Location: ../login.html");
     exit;
@@ -10,7 +9,6 @@ if (!isset($_SESSION["usuario"])) {
 
 $id_usuario = $_SESSION["usuario"]["id"];
 
-// Consultar planes del usuario
 $sql = "SELECT * FROM planes WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
@@ -23,41 +21,60 @@ $resultado = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <title>Mis Planes - FocusMeal</title>
-    <link rel="stylesheet" href="../css/index.css">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- MISMO CSS DEL PANEL -->
+    <link rel="stylesheet" href="../css/panel.css">
 </head>
 <body>
 
-<h1>🍽 Mis planes de alimentación</h1>
+    <!-- HEADER -->
+    <div class="panel-header">
+        <h1>Focus Meal 🍽️</h1>
+        <a href="panel.php" class="btn-primary">Volver al panel</a>
+    </div>
 
-<a href="panel.php">⬅ Volver al panel</a>
-<hr>
+    <div class="panel-container">
 
-<?php if ($resultado->num_rows > 0): ?>
-    <table border="1" cellpadding="10">
-        <thead>
-            <tr>
-                <th>Plan</th>
-                <th>Calorías diarias</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($plan = $resultado->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($plan["nombre_plan"]) ?></td>
-                    <td><?= htmlspecialchars($plan["calorias_diarias"]) ?> kcal</td>
-                    <td><?= htmlspecialchars($plan["fecha_inicio"]) ?></td>
-                    <td><?= htmlspecialchars($plan["fecha_fin"]) ?></td>
-                    <td><?= htmlspecialchars($plan["estado"]) ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
-<?php else: ?>
-    <p>❌ Aún no tienes planes asignados.</p>
-<?php endif; ?>
+        <div class="card">
+            <h2>🍽 Mis planes de alimentación</h2>
+        </div>
+
+        <?php if ($resultado->num_rows > 0): ?>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Plan</th>
+                            <th>Calorías diarias</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($plan = $resultado->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($plan["nombre_plan"]) ?></td>
+                                <td><?= htmlspecialchars($plan["calorias_diarias"]) ?> kcal</td>
+                                <td><?= htmlspecialchars($plan["fecha_inicio"]) ?></td>
+                                <td><?= htmlspecialchars($plan["fecha_fin"]) ?></td>
+                                <td><?= htmlspecialchars($plan["estado"]) ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="card" style="text-align:center;">
+                <h3>❌ Aún no tienes planes asignados</h3>
+                <p>Cuando tengas un plan activo aparecerá aquí.</p>
+            </div>
+        <?php endif; ?>
+
+    </div>
 
 </body>
 </html>

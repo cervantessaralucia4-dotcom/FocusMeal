@@ -1,0 +1,183 @@
+/* PALETA DE COLORES */
+:root {
+    --primary-dark: #0a1f44;
+    --primary-green: #1DB954;
+    --light-bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-dark: #1e1e1e;
+    --text-light: #6b7280;
+}
+
+/* ESTILO GENERAL */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+}
+
+/* HEADER DEL PANEL */
+.panel-header {
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h1{
+    font-size: 24px;
+    margin: 0;
+}
+
+.panel-header button {
+    background-color: var(--primary-green);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.panel-header button:hover {
+    transform: scale(1.05);
+    background-color: #16a34a;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.panel-container {
+    padding: 40px;
+}
+
+/*TARJETAS GENERALES */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* SECCION ESTADISTICAS */
+.stats {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 250px;
+    background: linear-gradient(135deg, var(--primary-green), #14a34a);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.stat-box:hover {
+    transform: scale(1.03);
+}
+
+.stat-box h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.stat-box p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* ==========================
+   TABLAS
+========================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    background-color: var(--primary-dark);
+    color: white;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* ==========================
+   BOTONES
+========================== */
+.btn-primary {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #16a34a;
+    transform: translateY(-2px);
+}
+
+/* ==========================
+   FORMULARIOS
+========================== */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 5px rgba(29,185,84,0.4);
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 768px) {
+    .stats {
+        flex-direction: column;
+    }
+
+    .panel-container {
+        padding: 20px;
+    }
+
+    .panel-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
