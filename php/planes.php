@@ -26,14 +26,18 @@ $resultado = $stmt->get_result();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- MISMO CSS DEL PANEL -->
-    <link rel="stylesheet" href="../css/panel.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
 
     <!-- HEADER -->
     <div class="panel-header">
-        <h1>Focus Meal 🍽️</h1>
-        <a href="panel.php" class="btn-primary">Volver al panel</a>
+        <div class="logo-container">
+    <img src="../img/logo.png" alt="FocusMeal Logo">
+    <span>Focus Meal</span>
+</div>
+
+    <a href="logout.php" class="btn-danger">Cerrar sesión</a>
     </div>
 
     <div class="panel-container">

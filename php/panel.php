@@ -3,10 +3,10 @@ session_start();
 
 if (!isset($_SESSION["usuario"])) {
     header("Location: ../login.html");
-    exit();
+    exit;
 }
 
-$usuario = $_SESSION["usuario"];
+$nombre = $_SESSION["usuario"]["nombre"];
 ?>
 
 <!DOCTYPE html>
@@ -15,65 +15,57 @@ $usuario = $_SESSION["usuario"];
     <meta charset="UTF-8">
     <title>Panel - FocusMeal</title>
 
-    <!-- Fuente profesional -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- CSS del panel -->
-    <link rel="stylesheet" href="../css/panel.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
 
-    <!-- HEADER -->
-    <div class="panel-header">
-        <h1>Focus Meal 🍽️</h1>
-        <a href="logout.php" class="btn-primary">Cerrar sesión</a>
-    </div>
-
-    <!-- CONTENEDOR PRINCIPAL -->
-    <div class="panel-container">
-
-        <!-- BIENVENIDA -->
-        <div class="card">
-            <h2>Bienvenida, <?php echo htmlspecialchars($usuario["nombre"]); ?> 👋</h2>
-            <p><strong>Correo:</strong> <?php echo htmlspecialchars($usuario["correo"]); ?></p>
-        </div>
-
-       <!-- ESTADÍSTICAS -->
-        <?php
-// Aquí luego conectaremos la base de datos
-$caloriasHoy = 0; // temporal hasta conectar BD
-$metaDiaria = 2200;
-
-if ($caloriasHoy > 0) {
-    $restantes = $metaDiaria - $caloriasHoy;
-?>
-
-<div class="stats">
-    <div class="stat-box">
-        <h2><?php echo $caloriasHoy; ?> kcal</h2>
-        <p>Calorías consumidas hoy</p>
-    </div>
-
-    <div class="stat-box">
-        <h2><?php echo $metaDiaria; ?> kcal</h2>
-        <p>Meta diaria</p>
-    </div>
-
-    <div class="stat-box">
-        <h2><?php echo $restantes; ?> kcal</h2>
-        <p>Calorías restantes</p>
-    </div>
+<div class="panel-header">
+    <div class="logo-container">
+    <img src="../img/logo.png" alt="FocusMeal Logo">
+    <span>Focus Meal</span>
 </div>
 
-<?php
-} else {
-?>
-
-<div class="card" style="text-align:center;">
-    <h3>Aún no has registrado comidas hoy 🍽️</h3>
-    <p>Comienza agregando tu primera comida para ver tu progreso.</p>
-    <br>
-    <a href="planes.php" class="btn-primary">Agregar comida</a>
+    <a href="logout.php" class="btn-danger">Cerrar sesión</a>
 </div>
 
-<?php } ?>
+<div class="panel-container">
+
+    <div class="card bienvenida">
+        <h2>👋 Bienvenido, <?= htmlspecialchars($nombre) ?></h2>
+        <p>Gestiona tu alimentación y progreso desde aquí.</p>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <a href="progreso.php" class="dashboard-card">
+            <h3>📊 Mi Progreso</h3>
+            <p>Ver evolución de peso y calorías</p>
+        </a>
+
+        <a href="agregar_comida.php" class="dashboard-card">
+            <h3>🍽 Agregar Comida</h3>
+            <p>Registrar alimentos consumidos</p>
+        </a>
+
+        <a href="planes.php" class="dashboard-card">
+            <h3>🥗 Mis Planes</h3>
+            <p>Ver plan de alimentación activo</p>
+        </a>
+
+        <a href="rutinas.php" class="dashboard-card">
+            <h3>🏋️ Rutinas</h3>
+            <p>Ver o asignar rutinas de ejercicio</p>
+        </a>
+
+        <a href="ajustes.php" class="dashboard-card">
+            <h3> ⚙ Ajustes</h3>
+            <p>Ajustes del perfil</p>
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
