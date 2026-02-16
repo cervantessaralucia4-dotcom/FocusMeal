@@ -159,6 +159,22 @@ tr:hover {
     transform: translateY(-2px);
 }
 
+.btn-plan {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-plan:hover {
+     background-color: #16a34a;
+    transform: translateY(-2px);
+}
+
 /* ==========================
    RESPONSIVE
 ========================== */
@@ -220,4 +236,66 @@ tr:hover {
 
 .btn-danger:hover {
     background: var(--primary-green);
+}
+
+.planes-conatiner {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.plan-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #0a1f44;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #0b1c2d;
+    color: white;
+}
+
+.navbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar img {
+    height: 40px;
+}
+
+.navbar nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    font-weight: 500;
+}
+
+.navbar nav a:hover {
+    color: #2ecc71;
+}
+
+
+.main-content {
+    padding: 40px;
 }

@@ -1,12 +1,28 @@
 <?php
 session_start();
+require __DIR__ . '/conexion.php';
 
 if (!isset($_SESSION["usuario"])) {
-    header("Location: ../login.html");
-    exit;
+    header("Location: ../html/login.html");
+    exit();
 }
 
-$nombre = $_SESSION["usuario"]["nombre"];
+$usuario_id = $_SESSION["usuario"]["id"];
+
+$sql = "SELECT nombre, plan FROM usuarios WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    die("Error en la consulta: " . $conexion->error);
+}
+
+$stmt->bind_param("i", $usuario_id);
+$stmt->execute();
+$resultado = $stmt->get_result();
+$usuario = $resultado->fetch_assoc();
+
+$nombre = $usuario["nombre"];
+$plan = $usuario["plan"];
 ?>
 
 <!DOCTYPE html>
@@ -22,9 +38,9 @@ $nombre = $_SESSION["usuario"]["nombre"];
 
 <div class="panel-header">
     <div class="logo-container">
-    <img src="../img/logo.png" alt="FocusMeal Logo">
-    <span>Focus Meal</span>
-</div>
+        <img src="../img/logo.png" alt="FocusMeal Logo">
+        <span>Focus Meal</span>
+    </div>
 
     <a href="logout.php" class="btn-danger">Cerrar sesión</a>
 </div>
@@ -34,6 +50,27 @@ $nombre = $_SESSION["usuario"]["nombre"];
     <div class="card bienvenida">
         <h2>👋 Bienvenido, <?= htmlspecialchars($nombre) ?></h2>
         <p>Gestiona tu alimentación y progreso desde aquí.</p>
+
+        <?php if ($plan): ?>
+            <div class="info-plan">
+                <p><strong>Plan activo:</strong> 
+                    <?php 
+                    if ($plan == "bajar_peso") {
+                        echo "🔥 Bajar de peso";
+                    } elseif ($plan == "ganar_musculo") {
+                        echo "💪 Ganar masa muscular";
+                    }
+                    ?>
+                </p>
+                <p><strong>Calorías objetivo:</strong> <?= $calorias ?> kcal</p>
+            </div>
+        <?php else: ?>
+            <div class="info-plan">
+                <p>No tienes un plan activo.</p>
+                <a href="planes.php?ver_planes=1" class="btn-primary">Elegir Plan</a
+            </div>
+
+        <?php endif; ?>
     </div>
 
     <div class="dashboard-grid">
@@ -59,7 +96,7 @@ $nombre = $_SESSION["usuario"]["nombre"];
         </a>
 
         <a href="ajustes.php" class="dashboard-card">
-            <h3> ⚙ Ajustes</h3>
+            <h3>⚙ Ajustes</h3>
             <p>Ajustes del perfil</p>
         </a>
 

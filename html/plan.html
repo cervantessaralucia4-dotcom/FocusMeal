@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Planes - FocusMeal</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+   <header class="navbar">
+    <div class="logo">
+        <img src="../img/logo.png" alt="FocusMeal">
+        <h2>Focus Meal</h2>
+    </div>
+
+    <nav>
+        <a href="index.html">Inicio</a>
+        <a href="plan.html">Planes</a>
+        <a href="login.html">Ingresar</a>
+    </nav>
+</header>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+
+        <h1>Elige tu plan</h1>
+
+        <div class="cards-container">
+
+            <div class="card">
+                <h2>Bajar de peso</h2>
+                <p>Déficit calórico controlado</p>
+                <form action="../php/guardar_plan.php" method="POST">
+                  <input type="hidden" name="plan" value="bajar_peso">
+                  <button type="submit" class="btn-plan">Seleccionar</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Ganar masa muscular</h2>
+                <p>Superávit calórico y alto en proteínas</p>
+                <form action="../php/guardar_plan.php" method="POST">
+                   <input type="hidden" name="plan" value="ganar_musculo">
+                   <button type="submit" class="btn-plan">Seleccionar</button>
+                </form>
+
+            </div>
+
+            <div class="card">
+                <h2>Plan balanceado</h2>
+                <p>Mantén tu peso ideal</p>
+                <form action="../php/guardar_plan.php" method="POST">
+                    <input type="hidden" name="plan" value="manteber_peso">
+                    <button type="submit" class="btn-plan">Seleccionar</button>
+                </form>
+            </div>
+            
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
