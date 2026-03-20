@@ -72,7 +72,7 @@ $pct_cal    = $meta_cal > 0 ? min(100, round($total_cal / $meta_cal * 100)) : 0;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agregar Comida — FocusMeal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@200;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
@@ -102,27 +102,7 @@ $pct_cal    = $meta_cal > 0 ? min(100, round($total_cal / $meta_cal * 100)) : 0;
     <!-- COLUMNA IZQUIERDA: foto + formulario -->
     <div class="card" style="flex:1; min-width:300px">
 
-      <!-- ANÁLISIS POR FOTO -->
-      <?php if ($plan_activo): ?>
-      <h3>📷 Analizar foto del plato</h3>
-      <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:12px">
-        Sube una foto y la IA estima las calorías y macros automáticamente.
-      </p>
-
-      <div id="zona-foto">
-        <input type="file" id="input-foto" accept="image/*" capture="environment">
-        <br><br>
-        <img id="preview-foto" src="" alt="" style="display:none; max-width:100%; border-radius:8px; margin-bottom:12px">
-        <button type="button" id="btn-analizar" class="btn-primary" style="display:none">
-          Analizar con IA
-        </button>
-        <p id="estado-analisis" style="font-size:0.85rem; color:var(--text-light);"></p>
-      </div>
-
-      <hr style="margin: 20px 0; border:none; border-top:1px solid #eee">
-      <?php endif; ?>
-
-      <!-- FORMULARIO MANUAL -->
+      <!-- FORMULARIO -->
       <h3>✏️ Nueva comida</h3>
 
       <?php if ($plan_activo): ?>
