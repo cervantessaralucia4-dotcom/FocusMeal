@@ -9,28 +9,30 @@ if (!isset($_SESSION["usuario"])) {
 
 $usuario_id = $_SESSION["usuario"]["id"];
 
-$sql = "SELECT nombre, plan FROM usuarios WHERE id_usuario = ?";
+$sql = "SELECT nombre, objetivo, tipo_dieta, peso_actual FROM usuarios WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
-
 if (!$stmt) {
-    die("Error en la consulta: " . $conexion->error);
+    die("Error en la consulta: " . $conn->error);
 }
-
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
-$resultado = $stmt->get_result();
-$usuario = $resultado->fetch_assoc();
+$usuario = $stmt->get_result()->fetch_assoc();
 
-$nombre = $usuario["nombre"];
-$plan = $usuario["plan"];
+$nombre     = $usuario["nombre"];
+$objetivo   = $usuario["objetivo"];
+$tipo_dieta = $usuario["tipo_dieta"];
+
+$sql2 = "SELECT nombre_plan, calorias_diarias FROM planes WHERE id_usuario = ? AND estado = 'Activo' LIMIT 1";
+$stmt2 = $conn->prepare($sql2);
+$stmt2->bind_param("i", $usuario_id);
+$stmt2->execute();
+$plan_activo = $stmt2->get_result()->fetch_assoc();
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Panel - FocusMeal</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/dashboard.css">
 </head>
@@ -41,7 +43,6 @@ $plan = $usuario["plan"];
         <img src="../img/logo.png" alt="FocusMeal Logo">
         <span>Focus Meal</span>
     </div>
-
     <a href="logout.php" class="btn-danger">Cerrar sesión</a>
 </div>
 
@@ -51,58 +52,45 @@ $plan = $usuario["plan"];
         <h2>👋 Bienvenido, <?= htmlspecialchars($nombre) ?></h2>
         <p>Gestiona tu alimentación y progreso desde aquí.</p>
 
-        <?php if ($plan): ?>
+        <?php if ($plan_activo): ?>
             <div class="info-plan">
-                <p><strong>Plan activo:</strong> 
-                    <?php 
-                    if ($plan == "bajar_peso") {
-                        echo "🔥 Bajar de peso";
-                    } elseif ($plan == "ganar_musculo") {
-                        echo "💪 Ganar masa muscular";
-                    }
-                    ?>
-                </p>
-                <p><strong>Calorías objetivo:</strong> <?= $calorias ?> kcal</p>
+                <p><strong>Plan activo:</strong> <?= htmlspecialchars($plan_activo["nombre_plan"]) ?></p>
+                <p><strong>Calorías objetivo:</strong> <?= htmlspecialchars($plan_activo["calorias_diarias"]) ?> kcal/día</p>
             </div>
         <?php else: ?>
             <div class="info-plan">
-                <p>No tienes un plan activo.</p>
-                <a href="planes.php?ver_planes=1" class="btn-primary">Elegir Plan</a
+                <p>No tienes un plan activo aún.</p>
+                <a href="planes.php" class="btn-primary">Elegir un plan</a>
             </div>
+        <?php endif; ?>
 
+        <?php if ($objetivo): ?>
+            <p style="margin-top:10px">
+                <strong>Objetivo:</strong> <?= htmlspecialchars($objetivo) ?> &nbsp;|&nbsp;
+                <strong>Dieta:</strong> <?= htmlspecialchars($tipo_dieta ?: 'General') ?>
+            </p>
         <?php endif; ?>
     </div>
 
     <div class="dashboard-grid">
-
         <a href="progreso.php" class="dashboard-card">
             <h3>📊 Mi Progreso</h3>
             <p>Ver evolución de peso y calorías</p>
         </a>
-
         <a href="agregar_comida.php" class="dashboard-card">
             <h3>🍽 Agregar Comida</h3>
             <p>Registrar alimentos consumidos</p>
         </a>
-
         <a href="planes.php" class="dashboard-card">
             <h3>🥗 Mis Planes</h3>
             <p>Ver plan de alimentación activo</p>
         </a>
-
-        <a href="rutinas.php" class="dashboard-card">
-            <h3>🏋️ Rutinas</h3>
-            <p>Ver o asignar rutinas de ejercicio</p>
-        </a>
-
         <a href="ajustes.php" class="dashboard-card">
             <h3>⚙ Ajustes</h3>
-            <p>Ajustes del perfil</p>
+            <p>Editar tu perfil</p>
         </a>
-
     </div>
 
 </div>
-
 </body>
 </html>

@@ -7,51 +7,56 @@ if (!isset($_SESSION["usuario"])) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Planes - FocusMeal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
 
-<h1>Planes Disponibles</h1>
-
-<div class="container">
-
-<?php
-$sql = "SELECT * FROM planes_disponibles";
-$resultado = $conn->query($sql);
-
-if (!$resultado) {
-    die("Error en la consulta: " . $conn->error);
-}
-
-if ($resultado->num_rows > 0) {
-
-    while ($plan = $resultado->fetch_assoc()) {
-        ?>
-
-        <div class="card">
-        <h3><?= $plan['nombre_plan'] ?></h3>
-        <p><?= $plan['descripcion'] ?></p>
-        <p class="price"><?= $plan['calorias_diarias'] ?> calorías diarias</p>
-
-            <form action="guardar_plan.php" method="POST">
-                <input type="hidden" name="id_plan" value="<?= $plan['id_plan'] ?>">
-                <button type="submit" class="btn-plan">Seleccionar</button>
-            </form>
-        </div>
-        <?php 
-    }
-
-} else {
-    echo "<p>No hay planes disponibles en la base de datos.</p>";
-}
-?>
-
+<div class="panel-header">
+    <div class="logo-container">
+        <img src="../img/logo.png" alt="FocusMeal Logo">
+        <span>Focus Meal</span>
+    </div>
+    <a href="logout.php" class="btn-danger">Cerrar sesión</a>
 </div>
 
+<div class="panel-container">
+    <h1>🥗 Planes disponibles</h1>
+
+    <div class="planes-conatiner">
+    <?php
+    $sql = "SELECT * FROM planes_disponibles ORDER BY calorias_diarias ASC";
+    $resultado = $conn->query($sql);
+
+    if (!$resultado) {
+        echo "<p>Error en la consulta: " . $conn->error . "</p>";
+    } elseif ($resultado->num_rows === 0) {
+        echo "<p>No hay planes disponibles aún.</p>";
+    } else {
+        while ($plan = $resultado->fetch_assoc()) {
+            ?>
+            <div class="plan-card">
+                <h3><?= htmlspecialchars($plan['nombre_plan']) ?></h3>
+                <p><?= htmlspecialchars($plan['descripcion'] ?? '') ?></p>
+                <p><strong><?= htmlspecialchars($plan['calorias_diarias']) ?> kcal/día</strong></p>
+                <form action="guardar_plan.php" method="POST">
+                    <input type="hidden" name="id_plan" value="<?= $plan['id_plan'] ?>">
+                    <button type="submit" class="btn-plan">Seleccionar</button>
+                </form>
+            </div>
+            <?php
+        }
+    }
+    ?>
+    </div>
+
+    <br>
+    <a href="panel.php">← Volver al panel</a>
+</div>
 </body>
 </html>
