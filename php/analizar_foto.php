@@ -34,8 +34,8 @@ $imagen_base64 = base64_encode(file_get_contents($archivo["tmp_name"]));
 $media_type    = $archivo["type"];
 
 // --- CONFIGURACIÓN ---
-$api_key = "AIzaSyChly6SkzHsa0ohjC4MQ_L01wxCJG6_Vyo"; // Obtén la tuya gratis en aistudio.google.com
-$modelo  = "gemini-1.5-flash"; // Modelo gratuito con visión
+$api_key = "AIzaSyA9yPcTWfO4dhVl140gW3ZSuk4GhB5rx0k"; // Obtén la tuya gratis en aistudio.google.com
+$modelo  = "gemini-2.0-flash"; // Modelo gratuito con visión
 $url     = "https://generativelanguage.googleapis.com/v1beta/models/{$modelo}:generateContent?key={$api_key}";
 
 $prompt = "Analiza esta imagen de comida y estima sus valores nutricionales para una porción normal visible.
