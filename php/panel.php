@@ -1,6 +1,7 @@
 <?php
 session_start();
 require __DIR__ . '/conexion.php';
+require __DIR__ . '/esPremium.php';
 
 if (!isset($_SESSION["usuario"])) {
     header("Location: ../html/login.html");
@@ -20,6 +21,7 @@ $stmt2 = $conn->prepare("SELECT id_plan, nombre_plan, calorias_diarias FROM plan
 $stmt2->bind_param("i", $usuario_id);
 $stmt2->execute();
 $plan_activo = $stmt2->get_result()->fetch_assoc();
+$es_premium = esPremium($conn, $usuario_id);
 
 // Calorías consumidas hoy desde tabla comidas
 $cal_hoy = 0;
@@ -127,6 +129,21 @@ $tipo_dieta = $usuario["tipo_dieta"];
             <h3>🥗 Mis Planes</h3>
             <p>Ver o cambiar tu plan activo</p>
         </a>
+        <?php if ($es_premium): ?>
+        <a href="generar_plan.php" class="dashboard-card" style="border-color:var(--green)">
+            <h3>🤖 Mi Plan IA</h3>
+            <p>Ver tu plan alimenticio personalizado</p>
+        </a>
+        <a href="chat_nutricionista.php" class="dashboard-card" style="border-color:var(--green)">
+            <h3>💬 Nutricionista</h3>
+            <p>Chat en vivo con tu nutricionista</p>
+        </a>
+        <?php else: ?>
+        <a href="planes.php" class="dashboard-card">
+            <h3>⭐ Activar Premium</h3>
+            <p>Desbloquea el plan IA y el chat</p>
+        </a>
+        <?php endif; ?>
         <a href="ajustes.php" class="dashboard-card">
             <h3>⚙ Ajustes</h3>
             <p>Editar tu perfil</p>
