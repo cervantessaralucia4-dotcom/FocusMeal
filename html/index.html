@@ -9,9 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@200;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="/css/index.css">
   <style>
-    /* ── Secciones generales ── */
     section { padding: 80px 0; }
     .section-tag {
       display: inline-block;
@@ -37,8 +36,6 @@
       margin: 0 auto 48px;
       line-height: 1.7;
     }
-
-    /* ── Override index.css que rompe el hero ── */
     .hero .fade-in,
     .hero .fade-in-delay {
       position: static !important;
@@ -51,8 +48,6 @@
       color: #ffffff !important;
       bottom: auto !important;
     }
-
-    /* ── HERO ── */
     .hero {
       min-height: 100vh;
       background: #071121;
@@ -160,10 +155,7 @@
       color: rgba(255,255,255,0.5);
       letter-spacing: 0.5px;
     }
-    .hero-mockup {
-      position: relative;
-      z-index: 2;
-    }
+    .hero-mockup { position: relative; z-index: 2; }
     .hero-mockup img {
       width: 100%;
       max-width: 480px;
@@ -171,8 +163,6 @@
       mask: linear-gradient(to bottom, black 60%, transparent 100%);
       -webkit-mask: linear-gradient(to bottom, black 60%, transparent 100%);
     }
-
-    /* ── BENEFICIOS ── */
     .beneficios { background: #f8fafb; }
     .beneficio-card {
       background: #fff;
@@ -197,20 +187,8 @@
       font-size: 1.4rem;
       margin-bottom: 18px;
     }
-    .beneficio-card h4 {
-      font-weight: 700;
-      font-size: 1rem;
-      color: #071121;
-      margin-bottom: 10px;
-    }
-    .beneficio-card p {
-      font-size: 0.88rem;
-      color: #5a6a7a;
-      line-height: 1.65;
-      margin: 0;
-    }
-
-    /* ── CÓMO FUNCIONA ── */
+    .beneficio-card h4 { font-weight: 700; font-size: 1rem; color: #071121; margin-bottom: 10px; }
+    .beneficio-card p { font-size: 0.88rem; color: #5a6a7a; line-height: 1.65; margin: 0; }
     .como-funciona { background: #fff; }
     .paso-num {
       width: 44px; height: 44px;
@@ -226,34 +204,16 @@
       margin: 0 auto 16px;
       flex-shrink: 0;
     }
-    .paso-card {
-      text-align: center;
-      padding: 32px 20px;
-      position: relative;
-    }
-    .paso-card h4 {
-      font-weight: 700;
-      font-size: 1rem;
-      color: #071121;
-      margin-bottom: 10px;
-    }
-    .paso-card p {
-      font-size: 0.87rem;
-      color: #5a6a7a;
-      line-height: 1.65;
-      margin: 0;
-    }
+    .paso-card { text-align: center; padding: 32px 20px; position: relative; }
+    .paso-card h4 { font-weight: 700; font-size: 1rem; color: #071121; margin-bottom: 10px; }
+    .paso-card p { font-size: 0.87rem; color: #5a6a7a; line-height: 1.65; margin: 0; }
     .paso-linea {
       position: absolute;
-      top: 54px;
-      right: -50%;
-      width: 100%;
-      height: 2px;
+      top: 54px; right: -50%;
+      width: 100%; height: 2px;
       background: linear-gradient(to right, #16A34A, #dcfce7);
       z-index: 0;
     }
-
-    /* ── PLANES ── */
     .planes-section { background: #f8fafb; }
     .plan-preview {
       background: #fff;
@@ -269,10 +229,7 @@
       box-shadow: 0 12px 36px rgba(7,17,33,0.1);
       border-color: #16A34A;
     }
-    .plan-preview.destacado {
-      border-color: #16A34A;
-      background: #071121;
-    }
+    .plan-preview.destacado { border-color: #16A34A; background: #071121; }
     .plan-preview.destacado h4,
     .plan-preview.destacado p,
     .plan-preview.destacado .plan-kcal { color: rgba(255,255,255,0.85) !important; }
@@ -289,17 +246,8 @@
       border-radius: 999px;
       margin-bottom: 14px;
     }
-    .plan-preview h4 {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #071121;
-      margin-bottom: 8px;
-    }
-    .plan-preview p {
-      font-size: 0.85rem;
-      color: #5a6a7a;
-      margin-bottom: 12px;
-    }
+    .plan-preview h4 { font-weight: 700; font-size: 1.05rem; color: #071121; margin-bottom: 8px; }
+    .plan-preview p { font-size: 0.85rem; color: #5a6a7a; margin-bottom: 12px; }
     .plan-kcal {
       font-family: 'Unbounded', sans-serif;
       font-weight: 600;
@@ -308,14 +256,7 @@
       display: block;
       margin-bottom: 6px;
     }
-    .plan-tipo {
-      font-size: 0.75rem;
-      color: #8a9ab0;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── TESTIMONIOS ── */
+    .plan-tipo { font-size: 0.75rem; color: #8a9ab0; text-transform: uppercase; letter-spacing: 0.5px; }
     .testimonios { background: #071121; }
     .testimonio-card {
       background: rgba(255,255,255,0.05);
@@ -323,18 +264,8 @@
       border-radius: 16px;
       padding: 28px;
     }
-    .testimonio-texto {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.8);
-      line-height: 1.7;
-      font-style: italic;
-      margin-bottom: 20px;
-    }
-    .testimonio-autor {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .testimonio-texto { font-size: 0.95rem; color: rgba(255,255,255,0.8); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+    .testimonio-autor { display: flex; align-items: center; gap: 12px; }
     .testimonio-avatar {
       width: 42px; height: 42px;
       background: #16A34A;
@@ -347,19 +278,9 @@
       color: #fff;
       flex-shrink: 0;
     }
-    .testimonio-nombre {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #fff;
-      display: block;
-    }
-    .testimonio-cargo {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.45);
-    }
+    .testimonio-nombre { font-weight: 600; font-size: 0.9rem; color: #fff; display: block; }
+    .testimonio-cargo { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
     .estrellas { color: #16A34A; font-size: 0.85rem; margin-bottom: 14px; }
-
-    /* ── PQRS ── */
     .pqrs-section { background: #fff; }
     .pqrs-form {
       background: #f8fafb;
@@ -412,21 +333,9 @@
       font-family: 'Inter', sans-serif;
     }
     .btn-pqrs:hover { background: #15803D; transform: translateY(-1px); }
-    .pqrs-info h5 {
-      font-weight: 700;
-      font-size: 1rem;
-      color: #071121;
-      margin-bottom: 8px;
-      margin-top: 28px;
-    }
-    .pqrs-info p {
-      font-size: 0.88rem;
-      color: #5a6a7a;
-      margin-bottom: 4px;
-    }
+    .pqrs-info h5 { font-weight: 700; font-size: 1rem; color: #071121; margin-bottom: 8px; margin-top: 28px; }
+    .pqrs-info p { font-size: 0.88rem; color: #5a6a7a; margin-bottom: 4px; }
     .pqrs-info i { color: #16A34A; width: 18px; }
-
-    /* ── CTA FINAL ── */
     .cta-final {
       background: linear-gradient(135deg, #071121 0%, #0d1f3c 100%);
       padding: 100px 0;
@@ -447,8 +356,6 @@
       margin-left: auto;
       margin-right: auto;
     }
-
-    /* ── FOOTER ── */
     .footer-main {
       background: #040c18;
       padding: 48px 0 24px;
@@ -470,12 +377,7 @@
       transition: color 0.2s;
     }
     .footer-links a:hover { color: #16A34A; }
-    .footer-divider {
-      border-color: rgba(255,255,255,0.08);
-      margin: 32px 0 20px;
-    }
-
-    /* ── Responsive ── */
+    .footer-divider { border-color: rgba(255,255,255,0.08); margin: 32px 0 20px; }
     @media (max-width: 768px) {
       section { padding: 56px 0; }
       .hero { padding-top: 80px; }
@@ -487,11 +389,10 @@
 </head>
 <body>
 
-<!-- ═══ NAVBAR ═══════════════════════════════════════════ -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="index.html">
-      <img src="../img/logo.png" alt="Focus Meal logo" class="logo-navbar">
+    <a class="navbar-brand d-flex align-items-center" href="/html/index.html">
+      <img src="/img/logo.png" alt="Focus Meal logo" class="logo-navbar">
       <span class="ms-2 logo-text">Focus Meal</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -503,16 +404,15 @@
         <li class="nav-item"><a class="nav-link" href="#como-funciona">Cómo funciona</a></li>
         <li class="nav-item"><a class="nav-link" href="#planes">Planes</a></li>
         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-        <li class="nav-item ms-lg-2"><a class="nav-link" href="login.html">Ingresar</a></li>
+        <li class="nav-item ms-lg-2"><a class="nav-link" href="/html/login.html">Ingresar</a></li>
         <li class="nav-item ms-lg-2">
-          <a href="registro.html" class="btn btn-primary btn-sm px-3">Comenzar gratis</a>
+          <a href="/html/registro.html" class="btn btn-primary btn-sm px-3">Comenzar gratis</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- ═══ HERO ══════════════════════════════════════════════ -->
 <section class="hero">
   <div class="container">
     <div class="row align-items-center">
@@ -525,7 +425,7 @@
           Registra tus comidas, sigue tu progreso y elige el plan nutricional que se adapta a tu objetivo. Todo en un solo lugar, simple y efectivo.
         </p>
         <div class="hero-btns">
-          <a href="registro.html" class="btn-hero-primary">Crear cuenta gratis</a>
+          <a href="/html/registro.html" class="btn-hero-primary">Crear cuenta gratis</a>
           <a href="#como-funciona" class="btn-hero-secondary">Ver cómo funciona</a>
         </div>
         <div class="hero-stats">
@@ -544,19 +444,17 @@
         </div>
       </div>
       <div class="col-lg-6 hero-mockup fade-in-delay text-center">
-        <img src="../img/mockup.png" alt="Focus Meal App">
+        <img src="/img/mockup.png" alt="Focus Meal App">
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ BENEFICIOS ════════════════════════════════════════ -->
 <section class="beneficios" id="beneficios">
   <div class="container text-center">
     <div class="section-tag">Por qué Focus Meal</div>
     <h2 class="section-title">Todo lo que necesitas para<br>comer mejor</h2>
     <p class="section-sub">Una herramienta pensada para que llevar tu alimentación sea simple, no una carga.</p>
-
     <div class="row g-4">
       <div class="col-md-4">
         <div class="beneficio-card">
@@ -604,13 +502,11 @@
   </div>
 </section>
 
-<!-- ═══ CÓMO FUNCIONA ════════════════════════════════════ -->
 <section class="como-funciona" id="como-funciona">
   <div class="container text-center">
     <div class="section-tag">Proceso simple</div>
     <h2 class="section-title">Empieza en 3 pasos</h2>
     <p class="section-sub">Sin configuraciones complicadas. En menos de 2 minutos ya tienes tu perfil listo.</p>
-
     <div class="row justify-content-center">
       <div class="col-md-4 position-relative">
         <div class="paso-card">
@@ -639,13 +535,11 @@
   </div>
 </section>
 
-<!-- ═══ PLANES ════════════════════════════════════════════ -->
 <section class="planes-section" id="planes">
   <div class="container text-center">
     <div class="section-tag">Nuestros planes</div>
     <h2 class="section-title">Un plan para cada objetivo</h2>
     <p class="section-sub">Todos los planes son gratuitos. Elige el que mejor se adapte a lo que quieres lograr.</p>
-
     <div class="row g-4 justify-content-center">
       <div class="col-md-4 col-sm-6">
         <div class="plan-preview">
@@ -676,22 +570,19 @@
         </div>
       </div>
     </div>
-
     <div class="mt-4">
-      <a href="../php/planes.php" class="btn-hero-primary" style="display:inline-block; margin-top:8px">
+      <a href="/php/planes.php" class="btn-hero-primary" style="display:inline-block; margin-top:8px">
         Ver todos los planes
       </a>
     </div>
   </div>
 </section>
 
-<!-- ═══ TESTIMONIOS ══════════════════════════════════════ -->
 <section class="testimonios">
   <div class="container text-center">
     <div class="section-tag" style="color:#4ade80">Lo que dicen nuestros usuarios</div>
     <h2 class="section-title" style="color:#fff">Resultados reales,<br>personas reales</h2>
     <p class="section-sub" style="color:rgba(255,255,255,0.5)">Cada historia es diferente, pero el objetivo es el mismo: vivir mejor.</p>
-
     <div class="row g-4 text-start">
       <div class="col-md-4">
         <div class="testimonio-card">
@@ -736,34 +627,28 @@
   </div>
 </section>
 
-<!-- ═══ PQRS / CONTACTO ══════════════════════════════════ -->
 <section class="pqrs-section" id="contacto">
   <div class="container">
     <div class="row align-items-start g-5">
-
       <div class="col-lg-5">
         <div class="section-tag">Contáctanos</div>
         <h2 class="section-title" style="text-align:left">¿Tienes preguntas,<br>sugerencias o dudas?</h2>
         <p style="color:#5a6a7a; font-size:0.95rem; line-height:1.7; margin-bottom:8px">
           Estamos aquí para ayudarte. Usa el formulario de PQRS para enviarnos tu solicitud y te responderemos a la brevedad.
         </p>
-
         <div class="pqrs-info">
           <h5>Tipos de solicitud</h5>
           <p><i class="fas fa-question-circle"></i> <strong>Pregunta</strong> — Dudas sobre el uso de la plataforma</p>
           <p><i class="fas fa-exclamation-circle"></i> <strong>Queja</strong> — Algo no funcionó como esperabas</p>
           <p><i class="fas fa-redo"></i> <strong>Reclamo</strong> — Inconformidad con un proceso</p>
           <p><i class="fas fa-lightbulb"></i> <strong>Sugerencia</strong> — Comparte tus ideas para mejorar</p>
-
           <h5>Tiempo de respuesta</h5>
           <p><i class="fas fa-clock"></i> Respondemos en un plazo máximo de <strong>48 horas hábiles</strong>.</p>
         </div>
       </div>
-
       <div class="col-lg-7">
         <div class="pqrs-form">
-          <form id="formPQRS" action="../php/pqrs.php" method="POST" novalidate>
-
+          <form id="formPQRS" action="/php/pqrs.php" method="POST" novalidate>
             <div class="row">
               <div class="col-md-6">
                 <label>Nombre completo *</label>
@@ -774,7 +659,6 @@
                 <input type="email" name="correo" id="pqrs-correo" placeholder="tu@correo.com" required>
               </div>
             </div>
-
             <label>Tipo de solicitud *</label>
             <select name="tipo" id="pqrs-tipo" required>
               <option value="">Seleccionar...</option>
@@ -783,35 +667,28 @@
               <option value="Reclamo">Reclamo</option>
               <option value="Sugerencia">Sugerencia</option>
             </select>
-
             <label>Asunto *</label>
             <input type="text" name="asunto" id="pqrs-asunto" placeholder="Describe brevemente tu solicitud" required>
-
             <label>Mensaje *</label>
             <textarea name="mensaje" id="pqrs-mensaje" placeholder="Cuéntanos con detalle..." required></textarea>
-
             <button type="submit" class="btn-pqrs">Enviar solicitud</button>
-
           </form>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ═══ CTA FINAL ═════════════════════════════════════════ -->
 <section class="cta-final">
   <div class="container">
     <h2>¿Listo para empezar<br>a comer mejor?</h2>
     <p>Únete a Focus Meal hoy. Crea tu cuenta gratis y da el primer paso hacia una alimentación más consciente.</p>
-    <a href="registro.html" class="btn-hero-primary" style="font-size:1rem; padding:16px 40px">
+    <a href="/html/registro.html" class="btn-hero-primary" style="font-size:1rem; padding:16px 40px">
       Crear cuenta gratis
     </a>
   </div>
 </section>
 
-<!-- ═══ FOOTER ════════════════════════════════════════════ -->
 <footer class="footer-main">
   <div class="container">
     <div class="row align-items-center">
@@ -826,7 +703,7 @@
         <a href="#contacto">Contacto</a>
       </div>
       <div class="col-md-4 text-md-end">
-        <a href="registro.html" class="btn-hero-primary" style="font-size:0.85rem; padding:10px 22px">Comenzar gratis</a>
+        <a href="/html/registro.html" class="btn-hero-primary" style="font-size:0.85rem; padding:10px 22px">Comenzar gratis</a>
       </div>
     </div>
     <hr class="footer-divider">
@@ -838,7 +715,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Navbar ocultar al bajar
   (function(){
     let last = 0;
     const nav = document.querySelector('.navbar');
@@ -849,7 +725,6 @@
     }, { passive: true });
   })();
 
-  // Smooth scroll para links del navbar
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       const target = document.querySelector(a.getAttribute('href'));
@@ -860,7 +735,6 @@
     });
   });
 
-  // Validación PQRS
   document.getElementById('formPQRS').addEventListener('submit', function(e) {
     const nombre  = document.getElementById('pqrs-nombre').value.trim();
     const correo  = document.getElementById('pqrs-correo').value.trim();
