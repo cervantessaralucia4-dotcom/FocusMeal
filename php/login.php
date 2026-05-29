@@ -4,7 +4,7 @@ include("conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
-    $correo = $_POST['correo'] ?? '';
+    $correo = trim($_POST['correo'] ?? '');
     $contraseña = $_POST['contraseña'] ?? '';
 
     // Buscar usuario por correo (tabla bien escrita)
