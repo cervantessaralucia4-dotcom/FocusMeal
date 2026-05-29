@@ -1,0 +1,12 @@
+# Configuración del archivo de inicio por defecto
+DirectoryIndex html/index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Si se solicita la raíz, servir html/index.html de forma transparente
+    RewriteRule ^$ html/index.html [L]
+
+    # Si se solicita index.html directamente en la raíz, servir html/index.html
+    RewriteRule ^index\.html$ html/index.html [L]
+</IfModule>
