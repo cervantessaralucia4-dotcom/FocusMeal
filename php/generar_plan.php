@@ -9,8 +9,9 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 $usuario_id = $_SESSION["usuario"]["id"];
+$es_premium = esPremium($conn, $usuario_id);
 
-if (!esPremium($conn, $usuario_id)) {
+if (!$es_premium) {
     header("Location: planes.php");
     exit;
 }
@@ -176,31 +177,33 @@ if (!$plan_json && $ultimo_plan) {
 }
 
 $dias_semana = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+$active_page = 'plan_ia';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Plan Alimenticio — FocusMeal</title>
+  <title>Mi Plan Alimenticio IA — FocusMeal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@200;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
-    .badge-premium { display:inline-block; background:var(--green); color:#fff; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-left:8px; vertical-align:middle; }
-
     /* Macros resumen */
-    .macros-bar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
-    .macro-pill { background:var(--navy); color:#fff; border-radius:10px; padding:14px 18px; flex:1; min-width:120px; text-align:center; }
-    .macro-pill strong { display:block; font-size:1.3rem; color:var(--green); }
-    .macro-pill span   { font-size:0.75rem; color:rgba(255,255,255,0.6); }
+    .macros-bar { display:flex; gap:12px; flex-wrap:wrap; }
+    .macro-pill { background:var(--background); border: 1px solid var(--border); border-radius:10px; padding:14px 18px; flex:1; min-width:110px; text-align:center; transition: var(--transition); }
+    .macro-pill:hover { border-color: var(--green); transform: translateY(-2px); }
+    .macro-pill strong { display:block; font-size:1.3rem; color:var(--green); font-family: var(--font-headings); }
+    .macro-pill span   { font-size:0.75rem; color:var(--text-light); font-weight: 500; }
 
     /* Selector de días */
-    .dias-nav { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:24px; scrollbar-width:none; }
+    .dias-nav { display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:24px; scrollbar-width:none; }
     .dias-nav::-webkit-scrollbar { display:none; }
     .dia-btn {
-      flex-shrink:0; padding:8px 16px;
-      background:var(--surface); border:1.5px solid var(--border);
-      border-radius:999px; font-family:'Inter',sans-serif; font-size:0.83rem;
+      flex-shrink:0; padding:10px 22px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:999px; font-family:'Inter',sans-serif; font-size:0.85rem;
       font-weight:600; color:var(--text-mid); cursor:pointer;
       transition:all 0.2s; white-space:nowrap;
     }
@@ -208,168 +211,223 @@ $dias_semana = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domi
     .dia-btn.activo { background:var(--navy); border-color:var(--navy); color:#fff; }
 
     /* Comidas del día */
-    .comidas-dia { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:600px) { .comidas-dia { grid-template-columns:1fr; } }
+    .comidas-dia { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media(max-width:768px) { .comidas-dia { grid-template-columns:1fr; } }
 
-    .comida-card { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:20px; transition:border-color 0.2s, transform 0.2s; }
-    .comida-card:hover { border-color:var(--green); transform:translateY(-2px); }
+    .comida-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; transition: var(--transition); position: relative; }
+    .comida-card:hover { border-color:var(--green); transform:translateY(-2px); box-shadow: var(--shadow-sm); }
     .comida-tipo { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-light); margin-bottom:8px; }
-    .comida-nombre { font-weight:700; font-size:0.95rem; color:var(--navy); margin-bottom:6px; }
-    .comida-ingredientes { font-size:0.82rem; color:var(--text-light); line-height:1.5; margin-bottom:10px; }
-    .comida-kcal { font-size:0.82rem; font-weight:700; color:var(--green); }
+    .comida-nombre { font-weight:700; font-size:1rem; color:var(--navy); margin-bottom:6px; font-family: var(--font-headings); }
+    .comida-ingredientes { font-size:0.85rem; color:var(--text-mid); line-height:1.6; margin-bottom:12px; }
+    .comida-kcal { font-size:0.85rem; font-weight:700; color:var(--green); }
 
-    .tipo-Desayuno  { border-top:3px solid #f59e0b; }
-    .tipo-Almuerzo  { border-top:3px solid var(--green); }
-    .tipo-Cena      { border-top:3px solid #7c3aed; }
-    .tipo-Snack     { border-top:3px solid #f97316; }
-
-    /* Sin datos */
-    .sin-perfil { background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:20px 24px; margin-bottom:24px; }
-    .sin-perfil p { color:#92400e; font-size:0.88rem; margin:0; }
-
-    .btn-generar { padding:12px 28px; background:var(--green); color:#fff; border:none; border-radius:999px; font-family:'Inter',sans-serif; font-size:0.92rem; font-weight:700; cursor:pointer; transition:background 0.2s, transform 0.15s; }
-    .btn-generar:hover { background:#15803D; transform:translateY(-1px); }
-    .btn-generar:disabled { background:#9ca3af; cursor:not-allowed; transform:none; }
+    .tipo-Desayuno  { border-left:4px solid #f59e0b; }
+    .tipo-Almuerzo  { border-left:4px solid var(--green); }
+    .tipo-Cena      { border-left:4px solid #7c3aed; }
+    .tipo-Snack     { border-left:4px solid #f97316; }
   </style>
 </head>
 <body>
 
-<div class="panel-header">
-  <div class="logo-container">
-    <img src="../img/logo.png" alt="FocusMeal">
-    <span>Focus Meal</span>
-  </div>
-  <a href="logout.php" class="btn-danger">Cerrar sesión</a>
-</div>
-
-<div class="panel-container">
-
-  <h1>🤖 Mi Plan Alimenticio <span class="badge-premium">Premium</span></h1>
-
-  <?php if ($mensaje): ?>
-    <p><strong><?= $tipo_msg === "exito" ? "✅" : "❌" ?> <?= htmlspecialchars($mensaje) ?></strong></p>
-  <?php endif; ?>
-
-  <?php if (!$perfil_completo): ?>
-    <div class="sin-perfil">
-      <p>⚠️ Para generar tu plan necesitas completar tu perfil (peso, altura, edad y objetivo).
-         <a href="ajustes.php" style="color:#92400e; font-weight:700;">Completar perfil →</a>
-      </p>
-    </div>
-  <?php endif; ?>
-
-  <div class="stats" style="margin-bottom:24px">
-
-    <!-- Info perfil -->
-    <div class="card" style="flex:1; min-width:240px">
-      <h3>Tu perfil nutricional</h3>
-      <p><strong>Peso:</strong> <?= $perfil["peso_actual"] ?: "—" ?> kg</p>
-      <p><strong>Altura:</strong> <?= $perfil["altura"] ?: "—" ?> cm</p>
-      <p><strong>Edad:</strong> <?= $perfil["edad"] ?: "—" ?> años</p>
-      <p><strong>Objetivo:</strong> <?= $perfil["objetivo"] ?: "—" ?></p>
-      <p><strong>Tipo de dieta:</strong> <?= $perfil["tipo_dieta"] ?: "General" ?></p>
-      <?php if ($ultimo_plan): ?>
-        <p style="margin-top:12px; font-size:0.78rem; color:var(--text-light)">
-          Último plan: <?= date("d/m/Y H:i", strtotime($ultimo_plan["fecha_gen"])) ?>
-        </p>
-      <?php endif; ?>
-      <br>
-      <form method="POST" action="generar_plan.php">
-        <button type="submit" class="btn-generar" <?= !$perfil_completo ? "disabled" : "" ?>>
-          <?= $ultimo_plan ? "🔄 Regenerar plan" : "✨ Generar mi plan" ?>
-        </button>
-      </form>
-    </div>
-
-    <!-- Macros objetivo -->
-    <?php if ($ultimo_plan): ?>
-    <div class="card" style="flex:2; min-width:280px">
-      <h3>Macros diarios objetivos</h3>
-      <div class="macros-bar">
-        <div class="macro-pill">
-          <strong><?= $ultimo_plan["calorias_obj"] ?></strong>
-          <span>kcal/día</span>
+<div class="panel-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <img src="../img/logo.png" alt="FocusMeal Logo" style="height: 32px;">
+                <span>Focus Meal</span>
+            </div>
         </div>
-        <div class="macro-pill">
-          <strong><?= $ultimo_plan["proteinas_obj"] ?>g</strong>
-          <span>Proteínas</span>
+        <ul class="sidebar-menu">
+            <li class="<?= ($active_page == 'dashboard') ? 'active' : '' ?>">
+                <a href="panel.php"><i class="fa-solid fa-house"></i> Panel de Control</a>
+            </li>
+            <li class="<?= ($active_page == 'progreso') ? 'active' : '' ?>">
+                <a href="progreso.php"><i class="fa-solid fa-chart-line"></i> Mi Progreso</a>
+            </li>
+            <li class="<?= ($active_page == 'comida') ? 'active' : '' ?>">
+                <a href="agregar_comida.php"><i class="fa-solid fa-utensils"></i> Agregar Comida</a>
+            </li>
+            <li class="<?= ($active_page == 'planes') ? 'active' : '' ?>">
+                <a href="planes.php"><i class="fa-solid fa-calendar-days"></i> Mis Planes</a>
+            </li>
+            <?php if ($es_premium): ?>
+                <li class="<?= ($active_page == 'plan_ia') ? 'active' : '' ?>">
+                    <a href="generar_plan.php"><i class="fa-solid fa-robot"></i> Mi Plan IA</a>
+                </li>
+                <li class="<?= ($active_page == 'nutricionista') ? 'active' : '' ?>">
+                    <a href="chat_nutricionista.php"><i class="fa-solid fa-comments"></i> Nutricionista</a>
+                </li>
+            <?php else: ?>
+                <li class="<?= ($active_page == 'premium') ? 'active' : '' ?>">
+                    <a href="planes.php" class="text-warning"><i class="fa-solid fa-star"></i> Activar Premium</a>
+                </li>
+            <?php endif; ?>
+            <li class="<?= ($active_page == 'ajustes') ? 'active' : '' ?>">
+                <a href="ajustes.php"><i class="fa-solid fa-gear"></i> Ajustes</a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="logout.php" class="btn-danger w-100 text-center d-block py-2 rounded-pill text-decoration-none" style="font-size: 0.85rem;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
         </div>
-        <div class="macro-pill">
-          <strong><?= $ultimo_plan["carbos_obj"] ?>g</strong>
-          <span>Carbohidratos</span>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">🤖 Mi Plan IA</h1>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Menú semanal adaptado con Inteligencia Artificial</p>
+            </div>
+            <span class="badge bg-success py-2 px-3 rounded-pill" style="background-color: var(--green) !important;"><i class="fa-solid fa-crown me-1"></i> Premium</span>
         </div>
-        <div class="macro-pill">
-          <strong><?= $ultimo_plan["grasas_obj"] ?>g</strong>
-          <span>Grasas</span>
+
+        <?php if ($mensaje): ?>
+            <div class="alert <?= $tipo_msg === 'exito' ? 'alert-success' : 'alert-danger' ?> alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md);">
+                <strong><?= $tipo_msg === 'exito' ? '✅' : '❌' ?></strong> <?= htmlspecialchars($mensaje) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!$perfil_completo): ?>
+            <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i> Para generar tu plan necesitas completar tus datos físicos y metas.
+                <a href="ajustes.php" class="alert-link ms-1">Completar mi perfil ahora →</a>
+            </div>
+        <?php endif; ?>
+
+        <div class="row g-4 mb-4">
+            <!-- Info perfil -->
+            <div class="col-lg-4">
+                <div class="card p-4 border-0 shadow-sm h-100" style="border-radius: var(--radius-lg); background: var(--surface);">
+                    <h3 class="h5 mb-3" style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);"><i class="fa-solid fa-user-doctor me-2 text-success"></i>Perfil Nutricional</h3>
+                    
+                    <ul class="list-group list-group-flush mb-4" style="font-size: 0.9rem;">
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2.5 bg-transparent" style="border-color: var(--border);">
+                            <span class="text-muted">Peso actual:</span>
+                            <span class="fw-bold" style="color: var(--navy);"><?= $perfil["peso_actual"] ?: "—" ?> kg</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2.5 bg-transparent" style="border-color: var(--border);">
+                            <span class="text-muted">Altura:</span>
+                            <span class="fw-bold" style="color: var(--navy);"><?= $perfil["altura"] ?: "—" ?> cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2.5 bg-transparent" style="border-color: var(--border);">
+                            <span class="text-muted">Edad:</span>
+                            <span class="fw-bold" style="color: var(--navy);"><?= $perfil["edad"] ?: "—" ?> años</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2.5 bg-transparent" style="border-color: var(--border);">
+                            <span class="text-muted">Objetivo:</span>
+                            <span class="fw-bold text-success"><?= $perfil["objetivo"] ?: "—" ?></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0 py-2.5 bg-transparent" style="border-color: var(--border);">
+                            <span class="text-muted">Dieta:</span>
+                            <span class="fw-bold" style="color: var(--navy);"><?= $perfil["tipo_dieta"] ?: "General" ?></span>
+                        </li>
+                    </ul>
+
+                    <?php if ($ultimo_plan): ?>
+                        <p class="text-muted small mb-3">
+                            <i class="fa-regular fa-clock me-1"></i> Generado el: <?= date("d/m/Y H:i", strtotime($ultimo_plan["fecha_gen"])) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <form method="POST" action="generar_plan.php">
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill border-0" style="background: var(--green); font-weight: 600;" <?= !$perfil_completo ? "disabled" : "" ?>>
+                            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> <?= $ultimo_plan ? "Regenerar Plan" : "Crear Plan con IA" ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Macros objetivo -->
+            <div class="col-lg-8">
+                <?php if ($ultimo_plan): ?>
+                <div class="card p-4 border-0 shadow-sm h-100" style="border-radius: var(--radius-lg); background: var(--surface);">
+                    <h3 class="h5 mb-3" style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);"><i class="fa-solid fa-chart-simple me-2 text-success"></i>Metas Diarias de Macronutrientes</h3>
+                    
+                    <div class="macros-bar mb-4">
+                        <div class="macro-pill shadow-sm">
+                            <strong><?= $ultimo_plan["calorias_obj"] ?></strong>
+                            <span>Kcal Diarias</span>
+                        </div>
+                        <div class="macro-pill shadow-sm">
+                            <strong><?= $ultimo_plan["proteinas_obj"] ?>g</strong>
+                            <span>Proteínas</span>
+                        </div>
+                        <div class="macro-pill shadow-sm">
+                            <strong><?= $ultimo_plan["carbos_obj"] ?>g</strong>
+                            <span>Carbos</span>
+                        </div>
+                        <div class="macro-pill shadow-sm">
+                            <strong><?= $ultimo_plan["grasas_obj"] ?>g</strong>
+                            <span>Grasas</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0" style="line-height: 1.6;">
+                        <i class="fa-solid fa-calculator me-1 text-success"></i> Calculado automáticamente con la fórmula Harris-Benedict para conseguir tu objetivo de <strong><?= htmlspecialchars($perfil["objetivo"]) ?></strong> de forma balanceada y saludable.
+                    </p>
+                </div>
+                <?php else: ?>
+                <div class="card p-4 border-0 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center text-center py-5" style="border-radius: var(--radius-lg); background: var(--surface);">
+                    <i class="fa-solid fa-robot fa-3x mb-3 text-muted opacity-25"></i>
+                    <h4 style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);">Calculadora IA lista</h4>
+                    <p class="text-muted small max-width-350">Presiona generar en tu perfil nutricional para estructurar tus macros y comidas.</p>
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
-      </div>
-      <p style="font-size:0.82rem; color:var(--text-light)">
-        Calculados con la fórmula Harris-Benedict según tu perfil y objetivo de <strong><?= $perfil["objetivo"] ?></strong>.
-      </p>
-    </div>
-    <?php endif; ?>
 
-  </div>
+        <!-- Menú semanal -->
+        <?php if ($plan_json && isset($plan_json["dias"])): ?>
+        <div class="card p-4 border-0 shadow-sm" style="border-radius: var(--radius-lg); background: var(--surface);">
+            <h3 class="h5 mb-3" style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);"><i class="fa-solid fa-calendar-days me-2 text-success"></i>Plan Semanal Sugerido</h3>
 
-  <!-- Menú semanal -->
-  <?php if ($plan_json && isset($plan_json["dias"])): ?>
+            <!-- Selector de días -->
+            <div class="dias-nav mb-4" id="dias-nav">
+                <?php foreach ($plan_json["dias"] as $i => $dia_data): ?>
+                    <button class="dia-btn <?= $i === 0 ? 'activo' : '' ?>" onclick="mostrarDia(<?= $i ?>)" id="btn-dia-<?= $i ?>">
+                        <?= htmlspecialchars($dia_data["dia"]) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
 
-    <div class="card">
-      <h3>📅 Menú semanal</h3>
-
-      <!-- Selector de días -->
-      <div class="dias-nav" id="dias-nav">
-        <?php foreach ($plan_json["dias"] as $i => $dia_data): ?>
-          <button class="dia-btn <?= $i === 0 ? 'activo' : '' ?>"
-                  onclick="mostrarDia(<?= $i ?>)"
-                  id="btn-dia-<?= $i ?>">
-            <?= htmlspecialchars($dia_data["dia"]) ?>
-          </button>
-        <?php endforeach; ?>
-      </div>
-
-      <!-- Contenido por día -->
-      <?php foreach ($plan_json["dias"] as $i => $dia_data): ?>
-        <div id="dia-<?= $i ?>" style="display:<?= $i === 0 ? 'block' : 'none' ?>">
-          <div class="comidas-dia">
-
-            <?php
-            $comidas = [
-              "desayuno" => ["label" => "Desayuno", "clase" => "tipo-Desayuno"],
-              "almuerzo" => ["label" => "Almuerzo", "clase" => "tipo-Almuerzo"],
-              "cena"     => ["label" => "Cena",     "clase" => "tipo-Cena"],
-              "snack"    => ["label" => "Snack",    "clase" => "tipo-Snack"],
-            ];
-            foreach ($comidas as $key => $info):
-              $c = $dia_data[$key] ?? null;
-              if (!$c) continue;
-            ?>
-              <div class="comida-card <?= $info['clase'] ?>">
-                <div class="comida-tipo"><?= $info["label"] ?></div>
-                <div class="comida-nombre"><?= htmlspecialchars($c["nombre"] ?? "") ?></div>
-                <div class="comida-ingredientes"><?= htmlspecialchars($c["ingredientes"] ?? "") ?></div>
-                <div class="comida-kcal">~<?= $c["calorias"] ?? 0 ?> kcal</div>
-              </div>
+            <!-- Contenido por día -->
+            <?php foreach ($plan_json["dias"] as $i => $dia_data): ?>
+                <div id="dia-<?= $i ?>" style="display:<?= $i === 0 ? 'block' : 'none' ?>">
+                    <div class="comidas-dia">
+                        <?php
+                        $comidas = [
+                          "desayuno" => ["label" => "Desayuno", "clase" => "tipo-Desayuno", "icon" => "fa-solid fa-mug-saucer text-warning"],
+                          "almuerzo" => ["label" => "Almuerzo", "clase" => "tipo-Almuerzo", "icon" => "fa-solid fa-utensils text-success"],
+                          "cena"     => ["label" => "Cena",     "clase" => "tipo-Cena", "icon" => "fa-solid fa-moon text-primary"],
+                          "snack"    => ["label" => "Snack",    "clase" => "tipo-Snack", "icon" => "fa-solid fa-apple-whole text-danger"],
+                        ];
+                        foreach ($comidas as $key => $info):
+                          $c = $dia_data[$key] ?? null;
+                          if (!$c) continue;
+                        ?>
+                          <div class="comida-card <?= $info['clase'] ?>">
+                            <div class="comida-tipo"><i class="<?= $info['icon'] ?> me-1"></i> <?= $info["label"] ?></div>
+                            <div class="comida-nombre"><?= htmlspecialchars($c["nombre"] ?? "") ?></div>
+                            <div class="comida-ingredientes"><?= htmlspecialchars($c["ingredientes"] ?? "") ?></div>
+                            <div class="comida-kcal">Estimación: ~<?= $c["calorias"] ?? 0 ?> kcal</div>
+                          </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             <?php endforeach; ?>
-
-          </div>
         </div>
-      <?php endforeach; ?>
-
-    </div>
-
-  <?php elseif ($perfil_completo): ?>
-    <div class="card" style="text-align:center; padding:48px">
-      <div style="font-size:2.5rem; margin-bottom:12px">🤖</div>
-      <p>Aún no tienes un plan generado. Presiona el botón para que la IA cree tu menú semanal personalizado.</p>
-    </div>
-  <?php endif; ?>
-
-  <br>
-  <a href="panel.php">← Volver al panel</a>
-
+        <?php elseif ($perfil_completo): ?>
+            <div class="card p-5 border-0 shadow-sm text-center" style="border-radius: var(--radius-lg); background: var(--surface);">
+                <i class="fa-solid fa-robot fa-3x mb-3 text-success"></i>
+                <h4 style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);">Genera tu menú ahora</h4>
+                <p class="text-muted small">Crea un menú balanceado estructurado por días y horas de forma instantánea.</p>
+            </div>
+        <?php endif; ?>
+    </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function mostrarDia(idx) {
   document.querySelectorAll('[id^="dia-"]').forEach(d => d.style.display = 'none');

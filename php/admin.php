@@ -80,7 +80,7 @@ if ($logueado) {
         $sql = "SELECT u.*, CASE WHEN s.id_suscripcion IS NOT NULL THEN 'Premium' ELSE 'Gratis' END as tipo_plan
                 FROM usuarios u
                 LEFT JOIN suscripciones s ON s.id_usuario = u.id_usuario AND s.estado = 'activa' AND s.fecha_vencimiento >= CURDATE()";
-        if ($buscar) $sql .= " WHERE u.nombre LIKE '%$buscar%' OR u.correo LIKE '%$buscar%'";
+        if ($buscar) $sql .= " WHERE (u.nombre LIKE '%$buscar%' OR u.correo LIKE '%$buscar%')";
         $sql .= " ORDER BY u.fecha_registro DESC LIMIT 100";
         $usuarios = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
     }
@@ -128,206 +128,251 @@ if ($logueado) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — FocusMeal</title>
+  <title>Administración — FocusMeal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@200;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
-    .admin-layout { display:flex; min-height:calc(100vh - 64px); }
-
-    /* Sidebar */
-    .admin-sidebar {
-      width: 220px; flex-shrink:0;
-      background: var(--navy); padding: 24px 0;
-      display: flex; flex-direction: column; gap: 4px;
+    body {
+        background-color: var(--bg);
     }
-    .admin-sidebar a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 22px; color: rgba(255,255,255,0.65);
-      text-decoration: none; font-size: 0.88rem; font-weight: 500;
-      transition: background 0.15s, color 0.15s; border-left: 3px solid transparent;
+    .form-control, .form-select {
+        background-color: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.9rem;
     }
-    .admin-sidebar a:hover { background: rgba(255,255,255,0.07); color: #fff; }
-    .admin-sidebar a.activo { background: rgba(22,163,74,0.15); color: #fff; border-left-color: var(--green); }
-    .admin-sidebar .seccion-titulo { padding: 16px 22px 6px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
-
-    /* Contenido */
-    .admin-content { flex:1; padding: 32px; overflow-y: auto; }
-    .admin-content h1 { font-family:'Unbounded',sans-serif; font-weight:400; font-size:1.4rem; color:var(--navy); margin-bottom:24px; }
-
-    /* Stat cards dashboard */
-    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
-    .stat-card { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:20px; }
-    .stat-card .num { font-family:'Unbounded',sans-serif; font-size:1.8rem; font-weight:600; color:var(--green); }
-    .stat-card .lbl { font-size:0.78rem; color:var(--text-light); margin-top:4px; }
-    .stat-card.navy { background:var(--navy); border-color:var(--navy); }
-    .stat-card.navy .num { color:#4ade80; }
-    .stat-card.navy .lbl { color:rgba(255,255,255,0.5); }
-
-    /* Buscador */
-    .buscador { display:flex; gap:10px; margin-bottom:20px; }
-    .buscador input { flex:1; padding:9px 14px; border:1.5px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:0.88rem; }
-    .buscador button { padding:9px 18px; background:var(--navy); color:#fff; border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; }
-
-    /* Badge */
-    .badge { display:inline-block; font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:999px; }
-    .badge.verde   { background:#dcfce7; color:#14532d; }
-    .badge.gris    { background:#f3f4f6; color:#374151; }
-    .badge.rojo    { background:#fee2e2; color:#991b1b; }
-    .badge.ambar   { background:#fef3c7; color:#92400e; }
-    .badge.navy    { background:var(--navy); color:#fff; }
-
-    /* Tabla admin */
-    table.admin-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
-    table.admin-table th { background:var(--navy); color:#fff; padding:10px 14px; text-align:left; font-weight:600; font-size:0.8rem; }
-    table.admin-table th:first-child { border-radius:8px 0 0 0; }
-    table.admin-table th:last-child  { border-radius:0 8px 0 0; }
-    table.admin-table td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--text-mid); vertical-align:middle; }
-    table.admin-table tr:last-child td { border-bottom:none; }
-    table.admin-table tr:hover td { background:#f8faff; }
-
-    /* Botones tabla */
-    .btn-tbl { padding:5px 12px; border:none; border-radius:6px; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; }
-    .btn-tbl.red   { background:#fee2e2; color:#991b1b; }
-    .btn-tbl.green { background:#dcfce7; color:#14532d; }
-    .btn-tbl.navy  { background:var(--navy); color:#fff; }
-
-    /* PQRS expand */
-    .pqrs-mensaje { font-size:0.82rem; color:var(--text-light); max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .respuesta-inline { margin-top:8px; }
-    .respuesta-inline textarea { width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:0.85rem; resize:vertical; min-height:70px; }
-
-    /* Form plan */
-    .form-plan { background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px; }
-    .form-plan .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .form-plan label { font-size:0.78rem; font-weight:600; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:4px; }
-    .form-plan input, .form-plan select, .form-plan textarea { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:0.88rem; margin-bottom:12px; }
-
-    .ingresos-box { background:var(--navy); border-radius:14px; padding:24px; color:#fff; margin-bottom:24px; display:flex; gap:32px; flex-wrap:wrap; }
-    .ingreso-item strong { display:block; font-size:1.6rem; color:#4ade80; font-family:'Unbounded',sans-serif; font-weight:600; }
-    .ingreso-item span   { font-size:0.8rem; color:rgba(255,255,255,0.5); }
-
-    @media(max-width:768px) {
-      .admin-sidebar { display:none; }
-      .admin-content { padding: 20px 16px; }
+    .form-control:focus, .form-select:focus {
+        background-color: #fff;
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        color: var(--text);
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-mid);
+        margin-bottom: 6px;
+    }
+    /* Special Admin Overrides */
+    .admin-login-body {
+        background-color: var(--navy);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+    }
+    .admin-login-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 420px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .admin-login-card .form-control {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+    .admin-login-card .form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--green);
+        color: #fff;
     }
   </style>
 </head>
-<body>
-
-<div class="panel-header">
-  <div class="logo-container">
-    <img src="../img/logo.png" alt="FocusMeal">
-    <span>Focus Meal</span>
-  </div>
-  <?php if ($logueado): ?>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <span style="color:rgba(255,255,255,0.6); font-size:0.82rem;">Panel Admin</span>
-      <form method="POST" style="margin:0">
-        <button name="logout_admin" class="btn-danger">Cerrar sesión</button>
-      </form>
-    </div>
-  <?php endif; ?>
-</div>
+<body class="<?= !$logueado ? 'admin-login-body' : '' ?>">
 
 <?php if (!$logueado): ?>
 
   <!-- LOGIN ADMIN -->
-  <div style="max-width:400px; margin:80px auto; padding:0 24px;">
-    <div class="card">
-      <h2 style="margin-bottom:6px">🔐 Panel Administración</h2>
-      <p style="color:var(--text-light); font-size:0.88rem; margin-bottom:20px">Acceso exclusivo para administradores.</p>
-      <?php if (isset($error_login)): ?>
-        <p><strong>❌ <?= htmlspecialchars($error_login) ?></strong></p>
-      <?php endif; ?>
-      <form method="POST">
-        <label>Usuario</label>
-        <input type="text" name="usuario" required placeholder="admin">
-        <label>Contraseña</label>
-        <input type="password" name="password" required>
-        <br>
-        <button type="submit" name="login_admin" class="btn-primary" style="width:100%">Ingresar</button>
-      </form>
+  <div class="admin-login-card text-center">
+    <div class="mb-4">
+        <img src="../img/logo.png" alt="FocusMeal Logo" style="height: 48px;" class="mb-2">
+        <h1 class="h4 font-headings fw-normal text-white mb-1">Panel Admin</h1>
+        <p class="text-muted small mb-0" style="color: rgba(255,255,255,0.4) !important;">Acceso exclusivo para administradores.</p>
     </div>
+    
+    <?php if (isset($error_login)): ?>
+        <div class="alert alert-danger border-0 small py-2 mb-3" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: var(--radius-sm);">
+            <i class="fa-solid fa-circle-xmark me-1"></i> <?= htmlspecialchars($error_login) ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" class="text-start">
+        <input type="hidden" name="login_admin" value="1">
+        
+        <div class="mb-3">
+            <label class="form-label text-white-50">Usuario</label>
+            <input type="text" name="usuario" class="form-control" placeholder="Nombre de usuario" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label text-white-50">Contraseña</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill border-0" style="background: var(--green); font-weight: 600;">Ingresar</button>
+    </form>
   </div>
 
 <?php else: ?>
 
-<div class="admin-layout">
-
+<div class="panel-layout">
   <!-- SIDEBAR -->
-  <div class="admin-sidebar">
-    <div class="seccion-titulo">General</div>
-    <a href="admin.php?seccion=dashboard" class="<?= $seccion==='dashboard' ? 'activo' : '' ?>">📊 Dashboard</a>
-    <div class="seccion-titulo">Gestión</div>
-    <a href="admin.php?seccion=usuarios"       class="<?= $seccion==='usuarios'       ? 'activo' : '' ?>">👥 Usuarios</a>
-    <a href="admin.php?seccion=suscripciones"  class="<?= $seccion==='suscripciones'  ? 'activo' : '' ?>">⭐ Suscripciones</a>
-    <a href="admin.php?seccion=planes"         class="<?= $seccion==='planes'         ? 'activo' : '' ?>">🥗 Planes</a>
-    <div class="seccion-titulo">Atención</div>
-    <a href="admin.php?seccion=pqrs"  class="<?= $seccion==='pqrs'  ? 'activo' : '' ?>">
-      📩 PQRS
-      <?php if(isset($pqrs_pendientes) && $pqrs_pendientes > 0): ?>
-        <span class="badge rojo" style="margin-left:auto"><?= $pqrs_pendientes ?></span>
-      <?php endif; ?>
-    </a>
-    <a href="admin.php?seccion=chats" class="<?= $seccion==='chats' ? 'activo' : '' ?>">💬 Chats</a>
-  </div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-brand">
+            <img src="../img/logo.png" alt="FocusMeal Logo" style="height: 32px;">
+            <span>FM Admin</span>
+        </div>
+    </div>
+    <ul class="sidebar-menu">
+        <li class="seccion-titulo">General</li>
+        <li class="<?= ($seccion === 'dashboard') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=dashboard"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        </li>
+        <li class="seccion-titulo">Gestión</li>
+        <li class="<?= ($seccion === 'usuarios') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=usuarios"><i class="fa-solid fa-users"></i> Usuarios</a>
+        </li>
+        <li class="<?= ($seccion === 'suscripciones') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=suscripciones"><i class="fa-solid fa-gem"></i> Suscripciones</a>
+        </li>
+        <li class="<?= ($seccion === 'planes') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=planes"><i class="fa-solid fa-heart-pulse"></i> Planes</a>
+        </li>
+        <li class="seccion-titulo">Atención</li>
+        <li class="<?= ($seccion === 'pqrs') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=pqrs" class="d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-envelope-open-text"></i> PQRS</span>
+                <?php if(isset($pqrs_pendientes) && $pqrs_pendientes > 0): ?>
+                    <span class="badge rounded-pill bg-danger" style="font-size: 0.65rem; padding: 3px 6px;"><?= $pqrs_pendientes ?></span>
+                <?php endif; ?>
+            </a>
+        </li>
+        <li class="<?= ($seccion === 'chats') ? 'active' : '' ?>">
+            <a href="admin.php?seccion=chats"><i class="fa-solid fa-comments"></i> Chats Clientes</a>
+        </li>
+    </ul>
+    <div class="sidebar-footer">
+        <form method="POST" class="m-0">
+            <button type="submit" name="logout_admin" class="btn btn-danger w-100 py-2 rounded-pill text-decoration-none" style="font-size: 0.85rem;"><i class="fa-solid fa-right-from-bracket"></i> Salir del Panel</button>
+        </form>
+    </div>
+  </aside>
 
   <!-- CONTENIDO -->
-  <div class="admin-content">
+  <main class="main-content">
 
     <?php if ($seccion === 'dashboard'): ?>
-      <h1>Dashboard</h1>
-
-      <div class="stat-grid">
-        <div class="stat-card"><div class="num"><?= $total_usuarios ?></div><div class="lbl">Usuarios totales</div></div>
-        <div class="stat-card navy"><div class="num"><?= $usuarios_premium ?></div><div class="lbl">Usuarios premium</div></div>
-        <div class="stat-card"><div class="num"><?= $subs_activas ?></div><div class="lbl">Suscripciones activas</div></div>
-        <div class="stat-card"><div class="num"><?= $nuevos_hoy ?></div><div class="lbl">Registros hoy</div></div>
-        <div class="stat-card navy"><div class="num"><?= $pqrs_pendientes ?></div><div class="lbl">PQRS pendientes</div></div>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">📊 Resumen General</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Visión de rendimiento y KPIs clave del sistema</p>
       </div>
 
-      <div class="ingresos-box">
-        <div class="ingreso-item">
-          <strong>$<?= number_format($ingresos_mensual, 0, ',', '.') ?></strong>
-          <span>Ingresos mensuales (subs mensuales)</span>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card p-3 border-0 shadow-sm text-center" style="border-radius: var(--radius-md); background: var(--surface);">
+                <div class="h2 mb-1" style="color: var(--green); font-family: var(--font-headings); font-weight: 600;"><?= $total_usuarios ?></div>
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Usuarios Totales</div>
+            </div>
         </div>
-        <div class="ingreso-item">
-          <strong>$<?= number_format($ingresos_anual, 0, ',', '.') ?></strong>
-          <span>Ingresos (subs anuales acumuladas)</span>
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card p-3 border-0 shadow-sm text-center" style="border-radius: var(--radius-md); background: var(--navy); color: #fff;">
+                <div class="h2 mb-1 text-success" style="font-family: var(--font-headings); font-weight: 600;"><?= $usuarios_premium ?></div>
+                <div class="text-white-50 small text-uppercase fw-semibold" style="font-size: 0.72rem;">Clientes Premium</div>
+            </div>
         </div>
-        <div class="ingreso-item">
-          <strong>$<?= number_format($ingresos_mensual + ($ingresos_anual / 12), 0, ',', '.') ?></strong>
-          <span>Ingreso mensual estimado total</span>
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card p-3 border-0 shadow-sm text-center" style="border-radius: var(--radius-md); background: var(--surface);">
+                <div class="h2 mb-1" style="color: var(--green); font-family: var(--font-headings); font-weight: 600;"><?= $subs_activas ?></div>
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Suscripciones Activas</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card p-3 border-0 shadow-sm text-center" style="border-radius: var(--radius-md); background: var(--surface);">
+                <div class="h2 mb-1" style="color: var(--green); font-family: var(--font-headings); font-weight: 600;"><?= $nuevos_hoy ?></div>
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">Registros Hoy</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card p-3 border-0 shadow-sm text-center" style="border-radius: var(--radius-md); background: var(--surface);">
+                <div class="h2 mb-1 <?= $pqrs_pendientes > 0 ? 'text-danger' : 'text-success' ?>" style="font-family: var(--font-headings); font-weight: 600;"><?= $pqrs_pendientes ?></div>
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 0.72rem;">PQRS Pendientes</div>
+            </div>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Accesos rápidos</h3>
-        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px">
-          <a href="admin.php?seccion=usuarios" class="btn-primary">Ver usuarios</a>
-          <a href="admin.php?seccion=pqrs&filtro=pendientes" class="btn-primary" style="background:var(--navy); border-color:var(--navy)">Ver PQRS pendientes</a>
-          <a href="panel_nutricionista.php" class="btn-primary" style="background:var(--navy); border-color:var(--navy)" target="_blank">Panel nutricionista</a>
-        </div>
+      <div class="card p-4 border-0 shadow-sm mb-4" style="border-radius: var(--radius-lg); background: var(--navy); color: #fff;">
+          <h3 class="h6 mb-3 text-white-50 text-uppercase" style="letter-spacing: 1px;"><i class="fa-solid fa-sack-dollar text-success me-2"></i>Facturación Estimada</h3>
+          <div class="row g-3">
+              <div class="col-md-4">
+                  <div class="small text-white-50">Mensual Directo (Planes Mensuales)</div>
+                  <div class="h3 font-headings mt-1 text-success fw-bold">$<?= number_format($ingresos_mensual, 0, ',', '.') ?> <span style="font-size:0.9rem; color:rgba(255,255,255,0.4)">COP</span></div>
+              </div>
+              <div class="col-md-4">
+                  <div class="small text-white-50">Anual Acumulado (Planes Anuales)</div>
+                  <div class="h3 font-headings mt-1 text-success fw-bold">$<?= number_format($ingresos_anual, 0, ',', '.') ?> <span style="font-size:0.9rem; color:rgba(255,255,255,0.4)">COP</span></div>
+              </div>
+              <div class="col-md-4">
+                  <div class="small text-white-50">Ingreso Mensualizado Estimado</div>
+                  <div class="h3 font-headings mt-1 text-success fw-bold">$<?= number_format($ingresos_mensual + ($ingresos_anual / 12), 0, ',', '.') ?> <span style="font-size:0.9rem; color:rgba(255,255,255,0.4)">COP</span></div>
+              </div>
+          </div>
+      </div>
+
+      <div class="card p-4 border-0 shadow-sm" style="border-radius: var(--radius-lg); background: var(--surface);">
+          <h3 class="h5 mb-3" style="font-family: var(--font-headings); font-weight: 500; color: var(--navy);"><i class="fa-solid fa-bolt text-success me-2"></i>Acciones Rápidas</h3>
+          <div class="d-flex gap-2 flex-wrap">
+              <a href="admin.php?seccion=usuarios" class="btn btn-primary px-4 py-2 border-0 rounded-pill" style="font-weight: 600; background: var(--green);">Gestionar Clientes</a>
+              <a href="admin.php?seccion=pqrs&filtro=pendientes" class="btn btn-secondary px-4 py-2 rounded-pill border-1" style="font-weight: 600;">Resolver Consultas</a>
+              <a href="panel_nutricionista.php" class="btn btn-secondary px-4 py-2 rounded-pill border-1" style="font-weight: 600;" target="_blank">Entrar como Nutricionista <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></a>
+          </div>
       </div>
 
     <?php elseif ($seccion === 'usuarios'): ?>
-      <h1>Usuarios (<?= count($usuarios) ?>)</h1>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">👥 Clientes Registrados</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Lista y control de cuentas de usuarios de FocusMeal</p>
+      </div>
 
-      <form method="GET" action="admin.php" class="buscador">
+      <form method="GET" action="admin.php" class="row g-2 mb-4">
         <input type="hidden" name="seccion" value="usuarios">
-        <input type="text" name="q" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" placeholder="Buscar por nombre o correo...">
-        <button type="submit">Buscar</button>
+        <div class="col-md-9 col-lg-10">
+            <input type="text" name="q" class="form-control mb-0" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" placeholder="Buscar por nombre o correo electrónico...">
+        </div>
+        <div class="col-md-3 col-lg-2">
+            <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill border-0" style="background: var(--green); font-weight: 600;"><i class="fa-solid fa-magnifying-glass me-1"></i> Buscar</button>
+        </div>
       </form>
 
-      <div class="card" style="padding:0; overflow:hidden">
-        <table class="admin-table">
-          <thead><tr>
-            <th>Nombre</th><th>Correo</th><th>Plan</th><th>Objetivo</th><th>Registro</th><th>Estado</th><th>Acción</th>
-          </tr></thead>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Contacto</th>
+              <th>Plan</th>
+              <th>Objetivo</th>
+              <th>Fecha Registro</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
           <tbody>
           <?php foreach ($usuarios as $u): ?>
             <tr>
-              <td><strong><?= htmlspecialchars($u['nombre']) ?></strong></td>
+              <td>
+                <div class="fw-bold text-dark"><?= htmlspecialchars($u['nombre']) ?></div>
+              </td>
               <td><?= htmlspecialchars($u['correo']) ?></td>
               <td>
                 <span class="badge <?= $u['tipo_plan'] === 'Premium' ? 'navy' : 'gris' ?>">
@@ -341,12 +386,12 @@ if ($logueado) {
                   <?= ($u['activo'] ?? 1) ? 'Activo' : 'Inactivo' ?>
                 </span>
               </td>
-              <td>
-                <form method="POST" style="margin:0">
+              <td class="text-end">
+                <form method="POST" class="m-0 d-inline-block">
                   <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
                   <input type="hidden" name="nuevo_estado" value="<?= ($u['activo'] ?? 1) ? 0 : 1 ?>">
-                  <button type="submit" name="toggle_usuario" class="btn-tbl <?= ($u['activo'] ?? 1) ? 'red' : 'green' ?>">
-                    <?= ($u['activo'] ?? 1) ? 'Desactivar' : 'Activar' ?>
+                  <button type="submit" name="toggle_usuario" class="btn btn-sm px-3 rounded-pill <?= ($u['activo'] ?? 1) ? 'btn-outline-danger' : 'btn-outline-success' ?>" style="font-weight: 600; font-size: 0.78rem;">
+                    <?= ($u['activo'] ?? 1) ? '<i class="fa-solid fa-user-slash me-1"></i> Desactivar' : '<i class="fa-solid fa-user-check me-1"></i> Activar' ?>
                   </button>
                 </form>
               </td>
@@ -357,18 +402,30 @@ if ($logueado) {
       </div>
 
     <?php elseif ($seccion === 'suscripciones'): ?>
-      <h1>Suscripciones</h1>
-      <div class="card" style="padding:0; overflow:hidden">
-        <table class="admin-table">
-          <thead><tr>
-            <th>Usuario</th><th>Plan</th><th>Tipo</th><th>Estado</th><th>Inicio</th><th>Vence</th><th>Referencia</th>
-          </tr></thead>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">⭐ Registro de Suscripciones</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Historial y estados de transacciones de suscripción</p>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Usuario / Correo</th>
+              <th>Plan Premium</th>
+              <th>Facturación</th>
+              <th>Estado</th>
+              <th>Inicio</th>
+              <th>Vencimiento</th>
+              <th>Referencia PayU</th>
+            </tr>
+          </thead>
           <tbody>
           <?php foreach ($subs as $s): ?>
             <tr>
               <td>
-                <strong><?= htmlspecialchars($s['nombre']) ?></strong><br>
-                <small style="color:var(--text-light)"><?= htmlspecialchars($s['correo']) ?></small>
+                <div class="fw-bold text-dark"><?= htmlspecialchars($s['nombre']) ?></div>
+                <div class="text-muted small"><?= htmlspecialchars($s['correo']) ?></div>
               </td>
               <td><?= htmlspecialchars($s['plan_nombre']) ?></td>
               <td><span class="badge <?= $s['tipo'] === 'anual' ? 'navy' : 'gris' ?>"><?= ucfirst($s['tipo']) ?></span></td>
@@ -379,7 +436,7 @@ if ($logueado) {
               </td>
               <td><?= date("d/m/Y", strtotime($s['fecha_inicio'])) ?></td>
               <td><?= date("d/m/Y", strtotime($s['fecha_vencimiento'])) ?></td>
-              <td style="font-size:0.75rem; color:var(--text-light)"><?= htmlspecialchars($s['referencia_payu'] ?: '—') ?></td>
+              <td class="font-monospace small text-muted"><?= htmlspecialchars($s['referencia_payu'] ?: '—') ?></td>
             </tr>
           <?php endforeach; ?>
           </tbody>
@@ -387,50 +444,69 @@ if ($logueado) {
       </div>
 
     <?php elseif ($seccion === 'planes'): ?>
-      <h1>Planes disponibles</h1>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">🥗 Planes Nutricionales Disponibles</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Define y administra los planes estándar recomendados en la app</p>
+      </div>
 
       <!-- Crear nuevo plan -->
-      <div class="form-plan">
-        <h3 style="margin-bottom:14px">+ Agregar plan</h3>
+      <div class="card p-4 border-0 shadow-sm mb-4" style="border-radius: var(--radius-lg); background: var(--surface);">
+        <h3 class="h6 mb-3" style="font-family: var(--font-headings); font-weight: 600;"><i class="fa-solid fa-circle-plus text-success me-2"></i>Agregar Nuevo Plan</h3>
         <form method="POST">
-          <div class="row">
-            <div>
-              <label>Nombre del plan</label>
-              <input type="text" name="nombre_plan" required placeholder="Ej: Déficit calórico leve">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombre del plan</label>
+              <input type="text" name="nombre_plan" class="form-control mb-0" required placeholder="Ej: Déficit calórico leve">
             </div>
-            <div>
-              <label>Calorías diarias</label>
-              <input type="number" name="calorias_diarias" required placeholder="1800">
+            <div class="col-md-6">
+              <label class="form-label">Calorías diarias</label>
+              <input type="number" name="calorias_diarias" class="form-control mb-0" required placeholder="1800">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tipo de dieta</label>
+              <select name="tipo_dieta" class="form-select mb-0">
+                <option value="General">General</option>
+                <option value="Vegetariana">Vegetariana</option>
+                <option value="Keto">Keto</option>
+                <option value="Baja en carbohidratos">Baja en carbohidratos</option>
+                <option value="Alta en proteinas">Alta en proteínas</option>
+              </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" name="crear_plan" class="btn btn-primary w-100 py-2.5 rounded-pill border-0" style="background: var(--green); font-weight: 600;">Guardar Plan en Catálogo</button>
             </div>
           </div>
-          <label>Descripción</label>
-          <textarea name="descripcion" rows="2" placeholder="Breve descripción del plan..."></textarea>
-          <label>Tipo de dieta</label>
-          <select name="tipo_dieta">
-            <option value="General">General</option>
-            <option value="Vegetariana">Vegetariana</option>
-            <option value="Keto">Keto</option>
-            <option value="Baja en carbohidratos">Baja en carbohidratos</option>
-            <option value="Alta en proteinas">Alta en proteínas</option>
-          </select>
-          <button type="submit" name="crear_plan" class="btn-primary">Guardar plan</button>
+          <div class="mb-0">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control mb-0" rows="2" placeholder="Describe brevemente el plan y sus objetivos..."></textarea>
+          </div>
         </form>
       </div>
 
-      <div class="card" style="padding:0; overflow:hidden">
-        <table class="admin-table">
-          <thead><tr><th>Nombre</th><th>Descripción</th><th>kcal/día</th><th>Tipo dieta</th><th>Acción</th></tr></thead>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Nombre del Plan</th>
+              <th>Descripción</th>
+              <th>kcal/día</th>
+              <th>Tipo Dieta</th>
+              <th class="text-end">Acción</th>
+            </tr>
+          </thead>
           <tbody>
           <?php foreach ($planes as $p): ?>
             <tr>
-              <td><strong><?= htmlspecialchars($p['nombre_plan']) ?></strong></td>
-              <td style="font-size:0.82rem; color:var(--text-light)"><?= htmlspecialchars($p['descripcion'] ?? '—') ?></td>
-              <td><?= $p['calorias_diarias'] ?></td>
+              <td><div class="fw-bold text-dark"><?= htmlspecialchars($p['nombre_plan']) ?></div></td>
+              <td class="small text-muted"><?= htmlspecialchars($p['descripcion'] ?? '—') ?></td>
+              <td class="fw-semibold text-success"><?= $p['calorias_diarias'] ?> kcal</td>
               <td><span class="badge gris"><?= htmlspecialchars($p['tipo_dieta'] ?? '—') ?></span></td>
-              <td>
-                <form method="POST" onsubmit="return confirm('¿Eliminar este plan?')">
+              <td class="text-end">
+                <form method="POST" class="m-0 d-inline-block" onsubmit="return confirm('¿Eliminar este plan?')">
                   <input type="hidden" name="id_plan" value="<?= $p['id_plan'] ?>">
-                  <button type="submit" name="eliminar_plan" class="btn-tbl red">Eliminar</button>
+                  <button type="submit" name="eliminar_plan" class="btn btn-sm btn-outline-danger px-3 rounded-pill" style="font-weight: 600; font-size: 0.78rem;">
+                    <i class="fa-solid fa-trash-can"></i> Eliminar
+                  </button>
                 </form>
               </td>
             </tr>
@@ -440,63 +516,104 @@ if ($logueado) {
       </div>
 
     <?php elseif ($seccion === 'pqrs'): ?>
-      <h1>PQRS</h1>
-
-      <div style="display:flex; gap:8px; margin-bottom:16px">
-        <a href="admin.php?seccion=pqrs" class="badge <?= ($_GET['filtro'] ?? '') !== 'pendientes' ? 'navy' : 'gris' ?>" style="padding:6px 14px; text-decoration:none">Todas</a>
-        <a href="admin.php?seccion=pqrs&filtro=pendientes" class="badge <?= ($_GET['filtro'] ?? '') === 'pendientes' ? 'navy' : 'gris' ?>" style="padding:6px 14px; text-decoration:none">Solo pendientes</a>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">📩 Consultas y PQRS</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Gestiona las solicitudes de soporte de los usuarios</p>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:14px">
-      <?php foreach ($pqrs_list as $pq): ?>
-        <div class="card" style="padding:20px">
-          <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap">
-            <span class="badge <?= $pq['estado'] === 'Pendiente' ? 'ambar' : 'verde' ?>"><?= $pq['estado'] ?></span>
-            <span class="badge gris"><?= $pq['tipo'] ?></span>
-            <strong style="font-size:0.9rem"><?= htmlspecialchars($pq['asunto']) ?></strong>
-            <span style="margin-left:auto; font-size:0.78rem; color:var(--text-light)"><?= date("d/m/Y H:i", strtotime($pq['fecha'])) ?></span>
-          </div>
-          <p style="font-size:0.85rem; margin:10px 0 4px"><strong><?= htmlspecialchars($pq['nombre']) ?></strong> — <?= htmlspecialchars($pq['correo']) ?></p>
-          <p style="font-size:0.85rem; color:var(--text-mid); margin-bottom:10px"><?= nl2br(htmlspecialchars($pq['mensaje'])) ?></p>
+      <div class="d-flex gap-2 mb-4">
+        <a href="admin.php?seccion=pqrs" class="badge <?= ($_GET['filtro'] ?? '') !== 'pendientes' ? 'navy' : 'gris' ?> px-4 py-2.5 text-decoration-none" style="font-size: 0.8rem;">Todas</a>
+        <a href="admin.php?seccion=pqrs&filtro=pendientes" class="badge <?= ($_GET['filtro'] ?? '') === 'pendientes' ? 'navy' : 'gris' ?> px-4 py-2.5 text-decoration-none" style="font-size: 0.8rem;">Solo Pendientes</a>
+      </div>
 
-          <?php if ($pq['respuesta']): ?>
-            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px 14px; font-size:0.85rem; color:#14532d">
-              <strong>Respuesta enviada:</strong><br><?= nl2br(htmlspecialchars($pq['respuesta'])) ?>
+      <div class="row g-3">
+      <?php foreach ($pqrs_list as $pq): ?>
+        <div class="col-12">
+            <div class="card p-4 border-0 shadow-sm" style="border-radius: var(--radius-lg); background: var(--surface);">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge <?= $pq['estado'] === 'Pendiente' ? 'ambar' : 'verde' ?>"><?= $pq['estado'] ?></span>
+                    <span class="badge gris"><?= $pq['tipo'] ?></span>
+                    <h3 class="h6 mb-0 font-headings" style="font-family: var(--font-headings); font-weight: 600; color: var(--navy);"><?= htmlspecialchars($pq['asunto']) ?></h3>
+                </div>
+                <span class="small text-muted"><?= date("d/m/Y H:i", strtotime($pq['fecha'])) ?></span>
+              </div>
+              
+              <div class="bg-light p-3 rounded mb-3" style="font-size: 0.88rem;">
+                <div class="fw-bold text-dark mb-1"><?= htmlspecialchars($pq['nombre']) ?> <span class="text-muted fw-normal" style="font-size: 0.8rem;">(<?= htmlspecialchars($pq['correo']) ?>)</span></div>
+                <div class="text-muted mt-1" style="white-space: pre-wrap;"><?= htmlspecialchars($pq['mensaje']) ?></div>
+              </div>
+
+              <?php if ($pq['respuesta']): ?>
+                <div class="p-3 border-0" style="border-radius: var(--radius-sm); background: rgba(22, 163, 74, 0.05); color: var(--green-dark); border-left: 4px solid var(--green) !important; font-size: 0.88rem;">
+                  <strong class="d-block mb-1"><i class="fa-solid fa-circle-check"></i> Respuesta enviada:</strong>
+                  <div style="white-space: pre-wrap;"><?= htmlspecialchars($pq['respuesta']) ?></div>
+                </div>
+              <?php else: ?>
+                <form method="POST" class="mt-2">
+                  <input type="hidden" name="id_pqrs" value="<?= $pq['id_pqrs'] ?>">
+                  <div class="mb-2">
+                      <textarea name="respuesta_pqrs" class="form-control mb-0" placeholder="Escribe la respuesta para enviar al cliente..." required></textarea>
+                  </div>
+                  <button type="submit" name="responder_pqrs" class="btn btn-primary px-4 py-2 rounded-pill border-0" style="background: var(--green); font-weight: 600;"><i class="fa-solid fa-paper-plane me-1"></i> Enviar Respuesta</button>
+                </form>
+              <?php endif; ?>
             </div>
-          <?php else: ?>
-            <form method="POST" class="respuesta-inline">
-              <input type="hidden" name="id_pqrs" value="<?= $pq['id_pqrs'] ?>">
-              <textarea name="respuesta_pqrs" placeholder="Escribe la respuesta..." required></textarea>
-              <button type="submit" name="responder_pqrs" class="btn-primary" style="margin-top:8px">Responder</button>
-            </form>
-          <?php endif; ?>
         </div>
       <?php endforeach; ?>
       <?php if (empty($pqrs_list)): ?>
-        <div class="card" style="text-align:center; color:var(--text-light)">No hay solicitudes.</div>
+        <div class="col-12">
+            <div class="card p-5 border-0 shadow-sm text-center text-muted" style="border-radius: var(--radius-lg); background: var(--surface);">
+                <i class="fa-solid fa-folder-open mb-2 h2 text-muted"></i>
+                <p class="mb-0">No se encontraron solicitudes.</p>
+            </div>
+        </div>
       <?php endif; ?>
       </div>
 
     <?php elseif ($seccion === 'chats'): ?>
-      <h1>Chats con nutricionista</h1>
-      <div class="card" style="padding:0; overflow:hidden">
-        <table class="admin-table">
-          <thead><tr><th>Usuario</th><th>Correo</th><th>Mensajes</th><th>Sin leer</th><th>Último mensaje</th><th>Acción</th></tr></thead>
+      <div class="mb-4">
+          <h1 class="h3 font-headings mb-1" style="font-family: var(--font-headings); font-weight: 500;">💬 Chats Activos con Nutricionista</h1>
+          <p class="text-muted mb-0" style="font-size: 0.9rem;">Bandeja de entrada y asesoramiento nutricional personalizado</p>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Correo</th>
+              <th>Total Mensajes</th>
+              <th>Sin Leer</th>
+              <th>Última Actividad</th>
+              <th class="text-end">Acción</th>
+            </tr>
+          </thead>
           <tbody>
           <?php foreach ($chats_res as $ch): ?>
             <tr>
-              <td><strong><?= htmlspecialchars($ch['nombre']) ?></strong></td>
+              <td><div class="fw-bold text-dark"><?= htmlspecialchars($ch['nombre']) ?></div></td>
               <td><?= htmlspecialchars($ch['correo']) ?></td>
               <td><?= $ch['total_mensajes'] ?></td>
-              <td><?= $ch['sin_leer'] > 0 ? '<span class="badge rojo">'.$ch['sin_leer'].'</span>' : '—' ?></td>
-              <td><?= date("d/m H:i", strtotime($ch['ultimo_mensaje'])) ?></td>
               <td>
-                <a href="panel_nutricionista.php?usuario=<?= $ch['id_usuario'] ?>" target="_blank" class="btn-tbl navy">Ver chat</a>
+                <?php if ($ch['sin_leer'] > 0): ?>
+                    <span class="badge bg-danger rounded-pill"><?= $ch['sin_leer'] ?></span>
+                <?php else: ?>
+                    <span class="text-muted">—</span>
+                <?php endif; ?>
+              </td>
+              <td><?= date("d/m H:i", strtotime($ch['ultimo_mensaje'])) ?></td>
+              <td class="text-end">
+                <a href="panel_nutricionista.php?usuario=<?= $ch['id_usuario'] ?>" target="_blank" class="btn btn-sm btn-outline-primary px-3 rounded-pill" style="font-weight: 600; font-size: 0.78rem;">
+                  <i class="fa-solid fa-message me-1"></i> Abrir Chat
+                </a>
               </td>
             </tr>
           <?php endforeach; ?>
           <?php if (empty($chats_res)): ?>
-            <tr><td colspan="6" style="text-align:center; color:var(--text-light)">No hay chats aún.</td></tr>
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">No hay chats registrados.</td>
+            </tr>
           <?php endif; ?>
           </tbody>
         </table>
@@ -504,9 +621,11 @@ if ($logueado) {
 
     <?php endif; ?>
 
-  </div>
+  </main>
 </div>
 
 <?php endif; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

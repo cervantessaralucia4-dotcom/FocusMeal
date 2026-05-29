@@ -75,225 +75,380 @@ if ($logueada && isset($_GET["usuario"])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Nutricionista — FocusMeal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@200;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
   <style>
-    body { background: var(--bg); }
-    .nutri-wrap { display: flex; height: calc(100vh - 64px); overflow: hidden; }
-
-    /* Sidebar usuarios */
-    .sidebar {
-      width: 300px; flex-shrink: 0;
-      background: var(--surface); border-right: 1px solid var(--border);
-      overflow-y: auto; display: flex; flex-direction: column;
+    body {
+        background-color: var(--bg);
     }
-    .sidebar-titulo {
-      padding: 18px 20px; font-weight: 700; font-size: 0.9rem;
-      color: var(--navy); border-bottom: 1px solid var(--border);
-      background: var(--surface); position: sticky; top: 0;
+    .nutri-layout {
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
     }
-    .usuario-item {
-      display: block; padding: 14px 20px; text-decoration: none;
-      border-bottom: 1px solid var(--border); transition: background 0.15s;
+    /* Sidebar Conversaciones */
+    .nutri-sidebar {
+        width: 320px;
+        background-color: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
     }
-    .usuario-item:hover { background: var(--bg); }
-    .usuario-item.activo { background: #f0fdf4; border-left: 3px solid var(--green); }
-    .usuario-nombre { font-weight: 600; font-size: 0.88rem; color: var(--navy); display: flex; align-items: center; justify-content: space-between; }
-    .usuario-correo { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
-    .badge-sin-leer {
-      background: var(--green); color: #fff;
-      font-size: 0.7rem; font-weight: 700;
-      padding: 2px 7px; border-radius: 999px;
+    .nutri-sidebar-header {
+        padding: 20px;
+        font-family: var(--font-headings);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--navy);
+        border-bottom: 1px solid var(--border);
+        background: #fcfdfe;
     }
-    .sidebar-vacio { padding: 32px 20px; text-align: center; color: var(--text-light); font-size: 0.85rem; }
-
-    /* Área de chat */
-    .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .chat-area-header {
-      padding: 16px 24px; background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px;
+    .nutri-chat-list {
+        flex: 1;
+        overflow-y: auto;
     }
-    .perfil-mini { font-size: 0.8rem; color: var(--text-light); }
-    .perfil-mini strong { color: var(--text); }
-
-    .mensajes-area {
-      flex: 1; overflow-y: auto; padding: 20px 24px;
-      display: flex; flex-direction: column; gap: 12px;
+    .nutri-chat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        text-decoration: none;
+        color: var(--text);
+        transition: var(--transition);
     }
-
-    .burbuja-wrap { display: flex; align-items: flex-end; gap: 8px; }
-    .burbuja-wrap.nutricionista { flex-direction: row-reverse; }
-    .avatar-chat {
-      width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    .nutri-chat-item:hover {
+        background-color: rgba(22, 163, 74, 0.02);
     }
-    .av-user  { background: var(--navy); color: #fff; }
-    .av-nutri { background: var(--green); color: #fff; }
-    .burbuja {
-      max-width: 68%; padding: 10px 14px; border-radius: 14px;
-      font-size: 0.88rem; line-height: 1.5;
+    .nutri-chat-item.activo {
+        background-color: rgba(22, 163, 74, 0.06);
+        border-left: 4px solid var(--green);
     }
-    .burbuja.usuario       { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
-    .burbuja.nutricionista { background: var(--navy); color: #fff; border-bottom-right-radius: 4px; }
-    .burbuja-hora { font-size: 0.68rem; color: var(--text-light); margin-top: 3px; }
-    .burbuja-wrap.nutricionista .burbuja-hora { text-align: right; }
-
-    /* Input respuesta */
-    .respuesta-form {
-      padding: 16px 24px; background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex; gap: 10px; align-items: flex-end;
+    .nutri-chat-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--navy);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        flex-shrink: 0;
     }
-    .respuesta-form textarea {
-      flex: 1; padding: 11px 14px; border: 1.5px solid var(--border);
-      border-radius: 10px; font-family: 'Inter', sans-serif;
-      font-size: 0.88rem; resize: none; min-height: 44px; max-height: 120px;
-      transition: border-color 0.2s; margin-bottom: 0;
+    .nutri-chat-item.activo .nutri-chat-avatar {
+        background-color: var(--green);
     }
-    .respuesta-form textarea:focus { outline: none; border-color: var(--green); }
-    .btn-resp {
-      padding: 11px 20px; background: var(--green); color: #fff;
-      border: none; border-radius: 999px; font-family: 'Inter', sans-serif;
-      font-size: 0.88rem; font-weight: 700; cursor: pointer; white-space: nowrap;
-      transition: background 0.2s;
+    .nutri-chat-info {
+        flex: 1;
+        min-width: 0;
     }
-    .btn-resp:hover { background: #15803D; }
-
-    .selecciona-txt {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      color: var(--text-light); font-size: 0.9rem; text-align: center; padding: 40px;
+    .nutri-chat-name {
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: var(--navy);
+        margin-bottom: 2px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-
-    /* Login */
-    .login-wrap {
-      max-width: 400px; margin: 80px auto; padding: 0 24px;
+    .nutri-chat-desc {
+        font-size: 0.78rem;
+        color: var(--text-light);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Area de Chat */
+    .nutri-chat-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #f8fafc;
+    }
+    .nutri-pane-header {
+        background-color: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .nutri-pane-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    /* Burbujas */
+    .chat-bubble-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    .chat-bubble-row.nutricionista {
+        flex-direction: row-reverse;
+    }
+    .chat-bubble-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .chat-bubble-avatar.usuario {
+        background: var(--navy-light);
+        color: #fff;
+    }
+    .chat-bubble-avatar.nutricionista {
+        background: var(--green);
+        color: #fff;
+    }
+    .chat-bubble-content {
+        max-width: 60%;
+    }
+    .chat-bubble {
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        box-shadow: var(--shadow-sm);
+    }
+    .chat-bubble-row.usuario .chat-bubble {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-bottom-left-radius: 4px;
+    }
+    .chat-bubble-row.nutricionista .chat-bubble {
+        background: var(--navy);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+    .chat-bubble-time {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        margin-top: 4px;
+        padding: 0 4px;
+    }
+    .chat-bubble-row.nutricionista .chat-bubble-time {
+        text-align: right;
+    }
+    
+    /* Input Form */
+    .nutri-chat-input-area {
+        background-color: var(--surface);
+        border-top: 1px solid var(--border);
+        padding: 18px 24px;
+    }
+    .nutri-chat-input-area textarea {
+        background-color: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        color: var(--text);
+        resize: none;
+        outline: none;
+        transition: var(--transition);
+        margin-bottom: 0;
+    }
+    .nutri-chat-input-area textarea:focus {
+        border-color: var(--green);
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+    
+    /* Login Page */
+    .login-body {
+        background-color: var(--navy);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        padding: 20px;
+    }
+    .login-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 420px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .login-card .form-control {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+    .login-card .form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--green);
+        color: #fff;
     }
   </style>
 </head>
-<body>
-
-<div class="panel-header">
-  <div class="logo-container">
-    <img src="../img/logo.png" alt="FocusMeal">
-    <span>Focus Meal</span>
-  </div>
-  <?php if ($logueada): ?>
-    <form method="POST" style="margin:0">
-      <button name="logout_nutri" class="btn-danger">Cerrar sesión</button>
-    </form>
-  <?php endif; ?>
-</div>
+<body class="<?= !$logueada ? 'login-body' : '' ?>">
 
 <?php if (!$logueada): ?>
 
   <!-- LOGIN NUTRICIONISTA -->
-  <div class="login-wrap">
-    <div class="card">
-      <h2 style="margin-bottom:6px">👩‍⚕️ Panel Nutricionista</h2>
-      <p style="color:var(--text-light); font-size:0.88rem; margin-bottom:20px">Acceso exclusivo para el equipo de nutrición.</p>
-
-      <?php if (isset($error_login)): ?>
-        <p><strong>❌ <?= htmlspecialchars($error_login) ?></strong></p>
-      <?php endif; ?>
-
-      <form method="POST">
-        <label>Usuario</label>
-        <input type="text" name="usuario" required placeholder="nutricionista">
-        <label>Contraseña</label>
-        <input type="password" name="password" required>
-        <br>
-        <button type="submit" name="login_nutri" class="btn-primary" style="width:100%">Ingresar</button>
-      </form>
+  <div class="login-card text-center">
+    <div class="mb-4">
+        <img src="../img/logo.png" alt="FocusMeal Logo" style="height: 48px;" class="mb-2">
+        <h1 class="h4 font-headings fw-normal text-white mb-1">Panel Nutricionista</h1>
+        <p class="text-muted small mb-0" style="color: rgba(255,255,255,0.4) !important;">Acceso exclusivo para el equipo de nutrición.</p>
     </div>
+    
+    <?php if (isset($error_login)): ?>
+        <div class="alert alert-danger border-0 small py-2 mb-3" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: var(--radius-sm);">
+            <i class="fa-solid fa-circle-xmark me-1"></i> <?= htmlspecialchars($error_login) ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" class="text-start">
+        <input type="hidden" name="login_nutri" value="1">
+        
+        <div class="mb-3">
+            <label class="form-label text-white-50">Usuario</label>
+            <input type="text" name="usuario" class="form-control" placeholder="Nutricionista" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label text-white-50">Contraseña</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill border-0" style="background: var(--green); font-weight: 600;">Ingresar</button>
+    </form>
   </div>
 
 <?php else: ?>
 
+  <!-- HEADER -->
+  <header class="panel-header">
+    <a href="admin.php" class="logo-container">
+      <img src="../img/logo.png" alt="FocusMeal Logo">
+      <span>Focus Meal</span>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <span class="small text-white-50 d-none d-sm-inline">🩺 Canal de Soporte Nutricional</span>
+      <form method="POST" class="m-0">
+        <button type="submit" name="logout_nutri" class="btn btn-danger px-3 py-1.5 rounded-pill text-decoration-none" style="font-size: 0.8rem;"><i class="fa-solid fa-right-from-bracket me-1"></i> Cerrar sesión</button>
+      </form>
+    </div>
+  </header>
+
   <!-- PANEL PRINCIPAL -->
-  <div class="nutri-wrap">
+  <div class="nutri-layout">
 
     <!-- Sidebar: lista de usuarios -->
-    <div class="sidebar">
-      <div class="sidebar-titulo">💬 Conversaciones (<?= count($usuarios_chat) ?>)</div>
+    <aside class="nutri-sidebar">
+      <div class="nutri-sidebar-header">
+        <i class="fa-regular fa-comments text-success me-2"></i> Conversaciones (<?= count($usuarios_chat) ?>)
+      </div>
 
-      <?php if (empty($usuarios_chat)): ?>
-        <div class="sidebar-vacio">Aún no hay mensajes de usuarios.</div>
-      <?php else: ?>
-        <?php foreach ($usuarios_chat as $u): ?>
-          <a href="panel_nutricionista.php?usuario=<?= $u['id_usuario'] ?>"
-             class="usuario-item <?= (isset($_GET['usuario']) && $_GET['usuario'] == $u['id_usuario']) ? 'activo' : '' ?>">
-            <div class="usuario-nombre">
-              <?= htmlspecialchars($u['nombre']) ?>
-              <?php if ($u['sin_leer'] > 0): ?>
-                <span class="badge-sin-leer"><?= $u['sin_leer'] ?></span>
-              <?php endif; ?>
-            </div>
-            <div class="usuario-correo"><?= htmlspecialchars($u['correo']) ?></div>
-          </a>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
+      <div class="nutri-chat-list">
+        <?php if (empty($usuarios_chat)): ?>
+          <div class="p-4 text-center text-muted small">
+            <i class="fa-regular fa-folder-open mb-2 d-block h4 text-muted"></i>
+            Aún no hay mensajes de usuarios.
+          </div>
+        <?php else: ?>
+          <?php foreach ($usuarios_chat as $u): ?>
+            <a href="panel_nutricionista.php?usuario=<?= $u['id_usuario'] ?>"
+               class="nutri-chat-item <?= (isset($_GET['usuario']) && $_GET['usuario'] == $u['id_usuario']) ? 'activo' : '' ?>">
+              <div class="nutri-chat-avatar">
+                <?= strtoupper(substr($u['nombre'], 0, 1)) ?>
+              </div>
+              <div class="nutri-chat-info">
+                <div class="nutri-chat-name">
+                  <span><?= htmlspecialchars($u['nombre']) ?></span>
+                  <?php if ($u['sin_leer'] > 0): ?>
+                    <span class="badge bg-danger rounded-pill" style="font-size: 0.6rem; padding: 3px 6px;"><?= $u['sin_leer'] ?></span>
+                  <?php endif; ?>
+                </div>
+                <div class="nutri-chat-desc"><?= htmlspecialchars($u['correo']) ?></div>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+    </aside>
 
     <!-- Área de chat -->
-    <div class="chat-area">
+    <main class="nutri-chat-pane">
 
       <?php if ($usuario_sel): ?>
 
         <!-- Header con perfil del usuario -->
-        <div class="chat-area-header">
-          <div class="avatar-chat av-user" style="width:38px; height:38px; font-size:1rem">
+        <div class="nutri-pane-header">
+          <div class="nutri-chat-avatar bg-success">
             <?= strtoupper(substr($usuario_sel['nombre'], 0, 1)) ?>
           </div>
           <div>
-            <strong style="font-size:0.95rem; color:var(--navy)"><?= htmlspecialchars($usuario_sel['nombre']) ?></strong>
-            <div class="perfil-mini">
-              <strong>Objetivo:</strong> <?= htmlspecialchars($usuario_sel['objetivo'] ?: '—') ?> &nbsp;|&nbsp;
-              <strong>Dieta:</strong> <?= htmlspecialchars($usuario_sel['tipo_dieta'] ?: '—') ?> &nbsp;|&nbsp;
-              <strong>Peso:</strong> <?= $usuario_sel['peso_actual'] ?: '—' ?> kg &nbsp;|&nbsp;
-              <strong>Edad:</strong> <?= $usuario_sel['edad'] ?: '—' ?> años
+            <h2 class="h6 mb-1 font-headings fw-bold text-dark" style="font-family: var(--font-headings);"><?= htmlspecialchars($usuario_sel['nombre']) ?></h2>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <span class="badge gris">Objetivo: <?= htmlspecialchars($usuario_sel['objetivo'] ?: '—') ?></span>
+              <span class="badge gris">Dieta: <?= htmlspecialchars($usuario_sel['tipo_dieta'] ?: '—') ?></span>
+              <span class="badge gris">Peso: <?= $usuario_sel['peso_actual'] ?: '—' ?> kg</span>
+              <span class="badge gris">Altura: <?= $usuario_sel['altura'] ?: '—' ?> cm</span>
+              <span class="badge gris">Edad: <?= $usuario_sel['edad'] ?: '—' ?> años</span>
             </div>
           </div>
         </div>
 
         <!-- Mensajes -->
-        <div class="mensajes-area" id="mensajes-area">
+        <div class="nutri-pane-messages" id="mensajes-area">
           <?php foreach ($conv as $msg): ?>
             <?php $es_nutri = $msg["enviado_por"] === "nutricionista"; ?>
-            <div class="burbuja-wrap <?= $es_nutri ? 'nutricionista' : 'usuario' ?>">
-              <div class="avatar-chat <?= $es_nutri ? 'av-nutri' : 'av-user' ?>">
-                <?= $es_nutri ? '👩‍⚕️' : strtoupper(substr($usuario_sel['nombre'], 0, 1)) ?>
+            <div class="chat-bubble-row <?= $es_nutri ? 'nutricionista' : 'usuario' ?>">
+              <div class="chat-bubble-avatar <?= $es_nutri ? 'nutricionista' : 'usuario' ?>">
+                <?= $es_nutri ? '<i class="fa-solid fa-user-doctor"></i>' : strtoupper(substr($usuario_sel['nombre'], 0, 1)) ?>
               </div>
-              <div>
-                <div class="burbuja <?= $es_nutri ? 'nutricionista' : 'usuario' ?>">
+              <div class="chat-bubble-content">
+                <div class="chat-bubble">
                   <?= nl2br(htmlspecialchars($msg["mensaje"])) ?>
                 </div>
-                <div class="burbuja-hora"><?= date("d/m H:i", strtotime($msg["fecha_envio"])) ?></div>
+                <div class="chat-bubble-time"><?= date("d/m H:i", strtotime($msg["fecha_envio"])) ?></div>
               </div>
             </div>
           <?php endforeach; ?>
         </div>
 
         <!-- Formulario de respuesta -->
-        <div class="respuesta-form">
-          <form method="POST" action="panel_nutricionista.php?usuario=<?= $usuario_sel['id'] ?>" style="display:flex; gap:10px; flex:1; align-items:flex-end; margin:0">
+        <div class="nutri-chat-input-area">
+          <form method="POST" action="panel_nutricionista.php?usuario=<?= $usuario_sel['id'] ?>" class="d-flex gap-2">
             <input type="hidden" name="id_usuario" value="<?= $usuario_sel['id'] ?>">
-            <textarea name="respuesta" placeholder="Escribe tu respuesta..." required id="resp-input"></textarea>
-            <button type="submit" class="btn-resp">Enviar</button>
+            <textarea name="respuesta" class="form-control" rows="1" placeholder="Escribe tu recomendación nutricional..." required id="resp-input" style="flex: 1;"></textarea>
+            <button type="submit" class="btn btn-primary px-4 rounded-pill border-0 d-flex align-items-center gap-2" style="background: var(--green); font-weight: 600;"><i class="fa-regular fa-paper-plane"></i> <span>Enviar</span></button>
           </form>
         </div>
 
       <?php else: ?>
-        <div class="selecciona-txt">
-          <div>
-            <div style="font-size:2.5rem; margin-bottom:12px">💬</div>
-            <p>Selecciona una conversación del panel izquierdo para ver los mensajes.</p>
-          </div>
+        <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted p-5">
+            <div class="display-5 text-muted mb-3"><i class="fa-regular fa-comments"></i></div>
+            <h3 class="h5 mb-1 font-headings text-dark" style="font-family: var(--font-headings); font-weight: 500;">Bandeja de Entrada</h3>
+            <p class="small text-center text-muted" style="max-width: 320px;">Selecciona un cliente de la lista de conversaciones para comenzar la asesoría nutricional.</p>
         </div>
       <?php endif; ?>
 
-    </div>
+    </main>
   </div>
 
 <?php endif; ?>
@@ -311,9 +466,15 @@ if (inp) {
     }
   });
   // Auto-refresh cada 30 segundos para ver mensajes nuevos
-  setTimeout(() => location.reload(), 30000);
+  setTimeout(() => {
+    // Solo recargar si no hay texto en el input
+    if(!inp.value.trim()){
+      location.reload();
+    }
+  }, 30000);
 }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
